@@ -1,0 +1,118 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
+from django.views.generic import View
+
+from student.models import StudentUser
+from tutor.models import TutorUser
+from .forms import UserForm, LoginForm
+from .models import UserProfile
+
+
+class LoginView(View):
+    form_class = LoginForm
+    template_name = 'main/login_form.html'
+
+    def get(self, request):
+        user = request.user
+
+        if user.is_authenticated:
+            user_profile = UserProfile.objects.get(user=user)
+            if user_profile.is_student_user():
+                return redirect('student:index')
+            if user_profile.is_tutor_user():
+                return redirect('tutor:index')
+            else:
+                return HttpResponseForbidden('User has no access rights for viewing this page')
+        else:
+            form = self.form_class(None)
+            return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        username = request.POST['username']
+        password = request.POST['password']
+
+        # returns User object if credentials are correct
+        user = authenticate(username=username, password=password)
+
+        if user is not None and user.is_active:
+            if user.is_authenticated:
+                login(request, user)
+                user_profile = UserProfile.objects.get(user=user)
+                if user_profile.is_student_user():
+                    return redirect('student:index')
+                if user_profile.is_tutor_user():
+                    return redirect('tutor:index')
+                else:
+                    return HttpResponseForbidden('User has no access rights for viewing this page')
+        else:
+            error_message = 'Credentials are incorrect'
+            return render(request, self.template_name, {'form': form, 'error_message': error_message})
+
+
+class LogoutView(View):
+    login_url = 'main:login'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(LogoutView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        logout(request)
+        return redirect(self.login_url)
+
+
+class UserFormView(View):
+    form_class = UserForm
+    template_name = 'main/registration_form.html'
+
+    def get(self, request):
+        form = self.form_class(None)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            user = form.save(commit=False)
+            is_tutor = user.is_tutor
+
+            password = form.cleaned_data['password']
+            username = user.first_name + ' ' + user.last_name
+
+            user.username = username
+            user.set_password(password)
+            user.save()
+
+            profile = UserProfile()
+            profile.user = user
+            profile.username = user.username
+            profile.first_name = user.first_name
+            profile.last_name = user.last_name
+            profile.save()
+
+            if is_tutor:
+                tutor = TutorUser()
+                tutor.profile = profile
+                tutor.save()
+
+            else:
+                student = StudentUser()
+                student.profile = profile
+                student.save()
+
+            # returns User object if credentials are correct
+
+            user = authenticate(username=username, password=password)
+
+            if user is not None and user.is_active:
+                login(request, user)
+                if is_tutor:
+                    return redirect('tutor:index')
+                else:
+                    return redirect('student:index')
+
+        return render(request, self.template_name, {'form': form})
