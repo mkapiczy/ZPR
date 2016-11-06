@@ -1,21 +1,25 @@
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from student.models import Album
 from main.models import UserProfile
+from main.permissions import has_tutor_permissions
+from student.models import Album
 from .models import TutorUser
 
 
 class IndexView(View):
     template_name = 'tutor/index.html'
-    context_object_name = 'all_albums'
     login_url = 'main:login'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        return super(IndexView, self).dispatch(request, *args, **kwargs)
+        if has_tutor_permissions(request.user):
+            return super(IndexView, self).dispatch(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
         all_albums = Album.objects.all()
