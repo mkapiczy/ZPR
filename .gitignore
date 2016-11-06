@@ -1,0 +1,15 @@
+**/*.idea
+nbactions.xml
+nb-configuration.xml
+*.iml
+.settings/
+.project
+.tern-project
+bin/
+tmp/
+**/*.classpath
+**/target/
+**/*.metadata/*
+**/*.recommenders
+dron-server/.metadata/*
+.idea
