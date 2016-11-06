@@ -13,3 +13,6 @@ tmp/
 **/*.recommenders
 dron-server/.metadata/*
 .idea
+**/migrations/*
+**/__pycache__/*
+db.sqlite3
