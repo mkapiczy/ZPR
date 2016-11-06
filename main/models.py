@@ -1,9 +1,6 @@
 from django.contrib.auth.models import (AbstractBaseUser)
 from django.contrib.auth.models import User
 from django.db import models
-from tutor.models import TutorUser
-from student.models import StudentUser
-
 
 class MyUser(User):
     # common fields
@@ -34,14 +31,18 @@ class UserProfile(models.Model):
 class Course(models.Model):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=16)
-    tutors = models.ManyToManyField(TutorUser)
-    students = models.ManyToManyField(StudentUser)
+    tutors = models.ManyToManyField('tutor.TutorUser')
+    students = models.ManyToManyField('student.StudentUser')
 
 
 class Project(models.Model):
-    name = models.CharField()
-    description = models.CharField()
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=5000)
     allowed_teams_number = models.IntegerField(default=1)
     allowed_students_number = models.IntegerField()
     available = models.BooleanField(default=True)
     course = models.ForeignKey(Course)
+    signed_students = models.ForeignKey('student.StudentUser')
+    # project_team = models.OneToOneField('student.ProjectTeam')
+    # OneToMany
+    tutor = models.ForeignKey('tutor.TutorUser')

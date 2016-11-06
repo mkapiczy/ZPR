@@ -1,6 +1,10 @@
-from django.db import models
 from django.core.urlresolvers import reverse
-from main.models import UserProfile
+from django.db import models
+
+from main.models import UserProfile, Project
+
+class ProjectTeam(models.Model):
+    project = models.OneToOneField(Project)
 
 class StudentUser(models.Model):
     profile = models.ForeignKey(UserProfile)
@@ -10,9 +14,12 @@ class StudentUser(models.Model):
     eres_id = models.CharField(max_length=16)
     status = models.BooleanField
     group = models.CharField(max_length=32)
+    project_team = models.ForeignKey(ProjectTeam)
 
     class Meta:
         db_table = 'student_user'
+
+
 
 class Album(models.Model):
     artist = models.CharField(max_length=250)

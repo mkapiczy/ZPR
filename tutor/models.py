@@ -1,12 +1,14 @@
 from django.db import models
 
-from main.models import UserProfile
+from main.models import UserProfile, Course
 
 
 class TutorUser(models.Model):
     profile = models.ForeignKey(UserProfile)
 
-    # totor fields
+    courses = models.ManyToManyField(Course)
+
 
     class Meta:
         db_table = 'tutor_user'
+
