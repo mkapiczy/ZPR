@@ -17,7 +17,6 @@ class LoginView(View):
 
     def get(self, request):
         user = request.user
-
         if user.is_authenticated:
             return redirect_according_to_user_type(request, user)
         else:
@@ -29,20 +28,16 @@ class LoginView(View):
         username = request.POST['username']
         password = request.POST['password']
 
-        # returns User object if credentials are correct
         user = authenticate(username=username, password=password)
 
-        if user is not None and user.is_active:
-            if user.is_authenticated:
-                login(request, user)
-                return redirect_according_to_user_type(request, user)
+        if user is not None and user.is_active and user.is_authenticated:
+            login(request, user)
+            return redirect_according_to_user_type(request, user)
         else:
-            error_message = 'Credentials are incorrect'
-            return render(request, self.template_name, {'form': form, 'error_message': error_message})
+            return render(request, self.template_name, {'form': form, 'error_message': 'Credentials are incorrect'})
 
 
 class LogoutView(View):
-    login_url = 'main:login'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -50,7 +45,7 @@ class LogoutView(View):
 
     def get(self, request):
         logout(request)
-        return redirect(self.login_url)
+        return redirect('main:login')
 
 
 class UserFormView(View):
@@ -86,13 +81,10 @@ class UserFormView(View):
                 tutor = TutorUser()
                 tutor.profile = profile
                 tutor.save()
-
             else:
                 student = StudentUser()
                 student.profile = profile
                 student.save()
-
-            # returns User object if credentials are correct
 
             user = authenticate(username=username, password=password)
 

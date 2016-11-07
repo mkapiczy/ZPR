@@ -46,3 +46,4 @@ class Project(models.Model):
     # project_team = models.OneToOneField('student.ProjectTeam')
     # OneToMany
     tutor = models.ForeignKey('tutor.TutorUser')
+
