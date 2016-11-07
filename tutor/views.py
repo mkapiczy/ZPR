@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from main.models import UserProfile, Course
+from main.models import UserProfile, Course, Post
 from main.permissions import has_tutor_permissions
 from student.models import Album
 from .models import TutorUser
@@ -22,9 +22,9 @@ class IndexView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
-        all_albums = Album.objects.all()
+        all_posts = Post.objects.all()
         user_profile = UserProfile.objects.get(user=request.user)
         tutor = TutorUser.objects.get(profile_id=user_profile.id)
         tutor_courses = tutor.courses.all()
-        return render(request, self.template_name, {'all_albums': all_albums, 'courses': tutor_courses})
+        return render(request, self.template_name, {'all_posts': all_posts, 'courses': tutor_courses})
 
