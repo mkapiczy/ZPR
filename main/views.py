@@ -1,14 +1,14 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 
 from student.models import StudentUser
 from tutor.models import TutorUser
 from .forms import UserForm, LoginForm
-from .models import UserProfile
+from .models import UserProfile, Course
 
 
 class LoginView(View):
@@ -19,13 +19,7 @@ class LoginView(View):
         user = request.user
 
         if user.is_authenticated:
-            user_profile = UserProfile.objects.get(user=user)
-            if user_profile.is_student_user():
-                return redirect('student:index')
-            if user_profile.is_tutor_user():
-                return redirect('tutor:index')
-            else:
-                return HttpResponseForbidden('User has no access rights for viewing this page')
+            return redirect_according_to_user_type(request, user)
         else:
             form = self.form_class(None)
             return render(request, self.template_name, {'form': form})
@@ -41,13 +35,7 @@ class LoginView(View):
         if user is not None and user.is_active:
             if user.is_authenticated:
                 login(request, user)
-                user_profile = UserProfile.objects.get(user=user)
-                if user_profile.is_student_user():
-                    return redirect('student:index')
-                if user_profile.is_tutor_user():
-                    return redirect('tutor:index')
-                else:
-                    return HttpResponseForbidden('User has no access rights for viewing this page')
+                return redirect_according_to_user_type(request, user)
         else:
             error_message = 'Credentials are incorrect'
             return render(request, self.template_name, {'form': form, 'error_message': error_message})
@@ -116,3 +104,20 @@ class UserFormView(View):
                     return redirect('student:index')
 
         return render(request, self.template_name, {'form': form})
+
+
+def redirect_according_to_user_type(request, user):
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.is_student_user():
+        return redirect('student:index')
+    if user_profile.is_tutor_user():
+        return redirect('tutor:index')
+    else:
+        return HttpResponseForbidden('User has no access rights for viewing this page')
+
+
+def select_course(request, course_id):
+    print("here")
+    course = get_object_or_404(Course, id=course_id)
+    request.session['selected_course'] = course.short_name
+    return redirect_according_to_user_type(request, request.user)

@@ -1,10 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from main.models import UserProfile
+from main.models import UserProfile, Course
 from main.permissions import has_tutor_permissions
 from student.models import Album
 from .models import TutorUser
@@ -23,8 +23,8 @@ class IndexView(View):
 
     def get(self, request):
         all_albums = Album.objects.all()
-        user = request.user
         user_profile = UserProfile.objects.get(user=request.user)
         tutor = TutorUser.objects.get(profile_id=user_profile.id)
         tutor_courses = tutor.courses.all()
         return render(request, self.template_name, {'all_albums': all_albums, 'courses': tutor_courses})
+
