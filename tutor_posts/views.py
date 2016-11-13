@@ -3,6 +3,7 @@ from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView
+from django.views.generic import DeleteView
 
 from main.models import UserProfile
 from main.permissions import has_tutor_permissions
@@ -16,12 +17,12 @@ class PostCreate(CreateView):
     model = Post
     template_name = 'tutor_posts/post_form.html'
     success_url = reverse_lazy('tutor:index')
+
     def form_valid(self, form):
         user_profile = UserProfile.objects.get(user=self.request.user)
         tutor = TutorUser.objects.get(profile_id=user_profile.id)
         form.instance.tutor = tutor
         return super(PostCreate, self).form_valid(form)
-
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -31,3 +32,13 @@ class PostCreate(CreateView):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
 
+class PostDelete(DeleteView):
+    model = Post
+    success_url = reverse_lazy('tutor:index')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if has_tutor_permissions(request.user):
+            return super(PostDelete, self).dispatch(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden('User has no access rights for viewing this page')

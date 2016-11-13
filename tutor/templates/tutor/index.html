@@ -39,10 +39,10 @@
 
                         <!-- Delete Album -->
                         {% if post.tutor.profile.user_id == request.user.id %}
-                            <form action="{% url 'student:album-delete' post.id %}" method="post"
+                            <form action="{% url 'tutor_posts:post-delete' post.id %}" method="post"
                                   style="display: inline;">
                                 {% csrf_token %}
-                                <input type="hidden" name="album_id" value="{{ post.id }}"/>
+                                <input type="hidden" name="post_id" value="{{ post.id }}"/>
                                 <button type="submit" class="btn btn-default btn-sm">
                                     <span class="glyphicon glyphicon-trash"></span>
                                 </button>
