@@ -109,7 +109,7 @@ def redirect_according_to_user_type(request, user):
 
 
 def select_course(request, course_id):
-    print("here")
     course = get_object_or_404(Course, id=course_id)
-    request.session['selected_course'] = course.short_name
+    request.session['selected_course_id'] = course.id
+    request.session['selected_course_shortname'] = course.short_name
     return redirect_according_to_user_type(request, request.user)

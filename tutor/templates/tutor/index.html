@@ -7,7 +7,7 @@
             <div class="col-sm-12">
                 <h3>Zalogowany jako: {{ user.username }} </h3>
                 <h4> Wybrany przedmiot:
-                    {% if request.session.selected_course %}{{ request.session.selected_course }}
+                    {% if request.session.selected_course_shortname %}{{ request.session.selected_course_shortname }}
                     {% else %}Brak wybranego przedmiotu{% endif %}</h4>
             </div>
         </div>
@@ -20,7 +20,7 @@
             <div class="col-sm-12">
                 <div class="thumbnail">
                     <div class="caption">
-                        <h1>{{ post.title }}</h1>
+                        <h1>{{ post.title }} ( {{ post.course.name }} )</h1>
                         <p>{{ post.content }}</p>
                         <div>
                        <span class="badge badge-success">Autor: {{ post.tutor.profile.last_name }} {{ post.tutor.profile.first_name }} -- Post
