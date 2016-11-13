@@ -16,3 +16,5 @@ dron-server/.metadata/*
 **/migrations/*
 **/__pycache__/*
 db.sqlite3
+perl.exe.stackdump
+*.stackdump
