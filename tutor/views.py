@@ -1,12 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from main.models import UserProfile, Course, Post
+from main.models import UserProfile
+from main_posts.models import Post
 from main.permissions import has_tutor_permissions
-from student.models import Album
 from .models import TutorUser
 
 

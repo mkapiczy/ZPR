@@ -5,7 +5,6 @@ from main.models import UserProfile, Course
 
 class TutorUser(models.Model):
     profile = models.ForeignKey(UserProfile)
-
     courses = models.ManyToManyField(Course)
 
 

@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.contrib.auth.models import (AbstractBaseUser)
 from django.contrib.auth.models import User
 from django.db import models
@@ -51,10 +49,4 @@ class Project(models.Model):
     tutor = models.ForeignKey('tutor.TutorUser')
 
 
-class Post(models.Model):
-    title = models.CharField(max_length=255)
-    content = models.CharField(max_length=10000)
-    creation_time = models.DateTimeField(default=datetime.now, blank=True)
-    general_post = models.BooleanField(default=False)
-    course = models.OneToOneField('main.Course')
-    tutor = models.OneToOneField('tutor.TutorUser')
+
