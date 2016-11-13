@@ -13,6 +13,12 @@
         </div>
 
     </div>
+    <br>
+    <a href="{% url 'tutor_posts:post-add' %}">
+        <button type="button" class="btn btn-success">
+            <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj nowy post
+        </button>
+    </a> <br><br>
 
 
     {% if all_posts %}

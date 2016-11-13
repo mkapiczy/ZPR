@@ -1,3 +1,33 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.generic import CreateView
 
-# Create your views here.
+from main.models import UserProfile
+from main.permissions import has_tutor_permissions
+from main_posts.models import Post
+from tutor.models import TutorUser
+from tutor_posts.forms import CreatePostForm
+
+
+class PostCreate(CreateView):
+    form_class = CreatePostForm
+    model = Post
+    template_name = 'tutor_posts/post_form.html'
+    success_url = reverse_lazy('tutor:index')
+    def form_valid(self, form):
+        user_profile = UserProfile.objects.get(user=self.request.user)
+        tutor = TutorUser.objects.get(profile_id=user_profile.id)
+        form.instance.tutor = tutor
+        return super(PostCreate, self).form_valid(form)
+
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if has_tutor_permissions(request.user):
+            return super(PostCreate, self).dispatch(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden('User has no access rights for viewing this page')
+
+
