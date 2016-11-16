@@ -18,11 +18,13 @@ class PostCreate(CreateView):
     template_name = 'tutor_posts/post_form.html'
     success_url = reverse_lazy('tutor:index')
 
+
     def form_valid(self, form):
         user_profile = UserProfile.objects.get(user=self.request.user)
         tutor = TutorUser.objects.get(profile_id=user_profile.id)
         form.instance.tutor = tutor
         return super(PostCreate, self).form_valid(form)
+
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
