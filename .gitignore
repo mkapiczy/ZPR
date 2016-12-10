@@ -11,10 +11,7 @@ tmp/
 **/target/
 **/*.metadata/*
 **/*.recommenders
-dron-server/.metadata/*
 .idea
-**/migrations/*
 **/__pycache__/*
-db.sqlite3
 perl.exe.stackdump
 *.stackdump
