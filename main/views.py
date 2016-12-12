@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
@@ -68,23 +69,15 @@ class UserFormView(View):
 
             user.username = username
             user.set_password(password)
-            user.save()
-
-            profile = UserProfile()
-            profile.user = user
-            profile.username = user.username
-            profile.first_name = user.first_name
-            profile.last_name = user.last_name
-            profile.save()
-
-            if is_tutor:
-                tutor = TutorUser()
-                tutor.profile = profile
-                tutor.save()
-            else:
-                student = StudentUser()
-                student.profile = profile
-                student.save()
+            try:
+                user.save()
+                profile = createNewUserProfile(user)
+                if is_tutor:
+                    createNewTutorUser(profile)
+                else:
+                   createNewStudentUser(profile)
+            except IntegrityError as e:
+                return uniqueContraintValidationRedirect(self, request, form)
 
             user = authenticate(username=username, password=password)
 
@@ -97,6 +90,27 @@ class UserFormView(View):
 
         return render(request, self.template_name, {'form': form})
 
+def createNewUserProfile(user):
+    profile = UserProfile()
+    profile.user = user
+    profile.username = user.username
+    profile.first_name = user.first_name
+    profile.last_name = user.last_name
+    profile.save()
+    return profile
+
+def createNewTutorUser(profile):
+    tutor = TutorUser()
+    tutor.profile = profile
+    tutor.save()
+
+def createNewStudentUser(profile):
+    student = StudentUser()
+    student.profile = profile
+    student.save()
+
+def uniqueContraintValidationRedirect(self, request, form):
+    return render(request, self.template_name, {'form': form, 'error_message': 'Istnieje już użytkownik o takich danych!'})
 
 def redirect_according_to_user_type(request, user):
     user_profile = UserProfile.objects.get(user=user)
