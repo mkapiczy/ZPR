@@ -40,10 +40,10 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=5000)
     allowed_teams_number = models.IntegerField(default=1)
-    allowed_students_number = models.IntegerField()
+    allowed_students_number = models.IntegerField(default=3)
     available = models.BooleanField(default=True)
     course = models.ForeignKey(Course)
-    signed_students = models.ForeignKey('student.StudentUser')
+    signed_students = models.ForeignKey('student.StudentUser', null=True)
     # project_team = models.OneToOneField('student.ProjectTeam')
     # OneToMany
     tutor = models.ForeignKey('tutor.TutorUser')

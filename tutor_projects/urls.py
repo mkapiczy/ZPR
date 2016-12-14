@@ -13,4 +13,6 @@ urlpatterns = [
 
     url(r'^read_projects_from_file/$', read_projects_from_file, name='read_projects_from_file'),
 
+    url(r'add/$', views.ProjectCreate.as_view(), name='project-add'),
+
 ]

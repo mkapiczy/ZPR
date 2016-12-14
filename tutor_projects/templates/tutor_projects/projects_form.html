@@ -7,7 +7,8 @@
             <div class="col-sm-12 col-md-7">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        <form class="form-horizontal" action="{% url 'tutor_projects:read_projects_from_file' %}" method="post" enctype="multipart/form-data">
+                        <form class="form-horizontal" action="{% url 'tutor_projects:read_projects_from_file' %}"
+                              method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <input type="file" name="projects_file"/>
                             <div class="form-group">
@@ -17,11 +18,25 @@
                             </div>
                         </form>
 
+                        <a href="{% url 'tutor_projects:project-add' %}">
+                            <button type="button" class="btn btn-success">
+                                <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj nowy post
+                            </button>
+                        </a> <br><br>
+
                         {% for description in request.session.desc %}
-                             <div class="caption">
-                                 {{ description}}
-                             </div><br>
-                         {% endfor %}
+                            <div class="caption">
+                                {{ description }}
+                            </div><br>
+                        {% endfor %}
+
+                        {% if course_projects %}
+                            {% for course in course_projects %}
+                                <div class="caption">
+                                    {{ course.name }} - {{ course.description }}
+                                </div><br>
+                            {% endfor %}
+                        {% endif %}
 
 
                     </div>
