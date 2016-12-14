@@ -12,6 +12,7 @@ tmp/
 **/*.metadata/*
 **/*.recommenders
 .idea
+.idea/*
 **/__pycache__/*
 perl.exe.stackdump
 *.stackdump
