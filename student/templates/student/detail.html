@@ -1,4 +1,4 @@
-{% extends 'music/base.html' %}
+{% extends 'student/base.html' %}
 
 {% block body %}
     <img src="{{ album.album_logo.url }}" class="img-responsive">
@@ -10,7 +10,7 @@
         <p><strong>{{ error_message }}</strong></p>
     {% endif %}
 
-    <form action="{% url 'music:detail' album.id %}" method="post">
+    <form action="{% url 'student:detail' album.id %}" method="post">
         {% csrf_token %}
         {% for song in album.song_set.all %}
             <label for="song{{ forloop.counter }}">{{ song.song_title }} - {{ song.file_type }}

@@ -18,7 +18,7 @@ from tutor_projects.forms import ProjectForm
 
 
 class ProjectsView(View):
-    template_name = 'tutor_projects/projects_form.html'
+    template_name = 'tutor_projects/projects_index.html'
     index_template = 'tutor/index.html'
 
 
@@ -95,12 +95,15 @@ def saveProject(project, request):
 
 
 class ProjectUpdate(UpdateView):
+    template_name = 'tutor_projects/project_form.html'
+    form_class = ProjectForm
     model = Project
-    fields = ['name', 'description', 'allowed_teams_number', 'allowed_students_number']
+    success_url = reverse_lazy('tutor_projects:projects')
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(ProjectUpdate, self).dispatch(request, *args, **kwargs)
+
 
 
 class ProjectDelete(DeleteView):

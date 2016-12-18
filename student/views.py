@@ -60,7 +60,7 @@ class AlbumUpdate(UpdateView):
 
 class AlbumDelete(DeleteView):
     model = Album
-    success_url = reverse_lazy('music:index')
+    success_url = reverse_lazy('student:index')
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
