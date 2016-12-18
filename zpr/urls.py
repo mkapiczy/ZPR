@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^zpr/tutor/', include('tutor.urls')),
     url(r'^zpr/tutor/posts/', include('tutor_posts.urls')),
     url(r'^zpr/tutor/projects/', include('tutor_projects.urls')),
+    url(r'^zpr/tutor/students/', include('tutor_students.urls')),
 
 ]
 

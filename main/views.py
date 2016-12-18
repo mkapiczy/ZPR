@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.db import IntegrityError
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,12 +9,12 @@ from django.views.generic import View
 
 from student.models import StudentUser
 from tutor.models import TutorUser
-from .forms import UserForm, LoginForm
+from .forms import UserForm
 from .models import UserProfile, Course
 
 
 class LoginView(View):
-    form_class = LoginForm
+    form_class = AuthenticationForm
     template_name = 'main/login_form.html'
 
     def get(self, request):
