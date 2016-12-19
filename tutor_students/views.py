@@ -2,6 +2,7 @@ import csv
 from io import TextIOWrapper
 from sqlite3 import IntegrityError
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
@@ -64,33 +65,67 @@ class CreateStudent(View):
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        form_student_user = self.form_class(request.POST)
+        form = self.form_class(request.POST)
 
-        if form_student_user.is_valid():
-            password = form_student_user.cleaned_data['album_number']
-            username = form_student_user.cleaned_data['first_name'] + form_student_user.cleaned_data['last_name']
-            print(password)
+        if form.is_valid():
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            album_number = form.cleaned_data['album_number']
+            group = form.cleaned_data['group']
+
+            password = album_number
+            username = first_name + last_name
+
             user = User.objects.create(username=username,
                                        email='jlennon@beatles.com',
                                        password=password,
-                                       first_name=form_student_user.cleaned_data['first_name'],
-                                       last_name=form_student_user.cleaned_data['last_name'])
-
+                                       first_name=first_name,
+                                       last_name=last_name)
             try:
                 user.save()
-                myUser = MyUser()
-                myUser.username = user.username
-                myUser.first_name = user.first_name
-                myUser.last_name = user.last_name
-                myUser.set_password(user.password)
-                myUser.user = user
-                myUser.save()
+                myUser = createMyUser(user)
                 profile = createNewUserProfile(myUser)
-                createNewStudentUser(profile, request)
+                createNewStudentUser(profile, album_number, group, request)
             except IntegrityError as e:
-                return uniqueContraintValidationRedirect(self, request, form_student_user)
+                return uniqueContraintValidationRedirect(self, request, form)
 
         return redirect('tutor_students:index')
+
+class DeleteStudent(View):
+
+    def post(self, request, pk):
+        student_id = request.POST['student_id']
+
+        if student_id is not None:
+            student = get_object_or_404(StudentUser, id=student_id)
+            profile = get_object_or_404(UserProfile, id=student.profile.id)
+            myUser = get_object_or_404(MyUser, id=profile.user.id)
+            user = get_object_or_404(User, id=myUser.user.id)
+
+            try:
+                student.delete()
+                profile.delete()
+                myUser.delete()
+                user.delete()
+            except User.DoesNotExist:
+                messages.error(request, "User doesnot exist")
+                return render(request, 'tutor_students/students_index.html')
+
+            except Exception as e:
+                return render(request, 'tutor_students/students_index.html', {'err': e})
+
+        return redirect('tutor_students:index')
+
+
+def createMyUser(user):
+    myUser = MyUser()
+    myUser.username = user.username
+    myUser.first_name = user.first_name
+    myUser.last_name = user.last_name
+    myUser.set_password(user.password)
+    myUser.user = user
+    myUser.save()
+    return myUser
 
 
 def createNewUserProfile(user):
@@ -103,9 +138,11 @@ def createNewUserProfile(user):
     return profile
 
 
-def createNewStudentUser(profile, request):
+def createNewStudentUser(profile, album_number, group, request):
     student = StudentUser()
     student.profile = profile
+    student.album_number = album_number
+    student.group = group
     course_id = request.session.get('selected_course_id')
     course = get_object_or_404(Course, id=course_id)
     student.course = []
