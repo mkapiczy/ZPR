@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -91,8 +90,49 @@ class CreateStudent(View):
 
         return redirect('tutor_students:index')
 
-class DeleteStudent(View):
 
+class UpdateStudent(View):
+    form_class = StudentForm
+    template_name = 'tutor_students/student_form.html'
+
+
+    def get(self, request, pk):
+        student_id = request.GET['student_id']
+        if (student_id is not None):
+            student = get_object_or_404(StudentUser, id=student_id)
+            form = StudentForm(
+                {'album_number': student.album_number, 'group': student.group, 'first_name': student.profile.first_name,
+                 'last_name': student.profile.last_name})
+            form.fields['first_name'].widget.attrs['readonly'] = True
+            form.fields['last_name'].widget.attrs['readonly'] = True
+            return render(request, self.template_name, {'form': form})
+        else:
+            return redirect('tutor_students:index')
+
+    def post(self, request, pk):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            student_id = pk
+            print(student_id)
+            if (student_id is not None):
+                student = get_object_or_404(StudentUser, id=student_id)
+                first_name = form.cleaned_data['first_name']
+                last_name = form.cleaned_data['last_name']
+                album_number = form.cleaned_data['album_number']
+                group = form.cleaned_data['group']
+                print(album_number)
+                student.album_number = album_number
+
+                try:
+                    student.save()
+                except IntegrityError as e:
+                    return uniqueContraintValidationRedirect(self, request, form)
+
+        return redirect('tutor_students:index')
+
+
+class DeleteStudent(View):
     def post(self, request, pk):
         student_id = request.POST['student_id']
 
@@ -112,7 +152,7 @@ class DeleteStudent(View):
                 return render(request, 'tutor_students/students_index.html')
 
             except Exception as e:
-                return render(request, 'tutor_students/students_index.html', {'err': e})
+                return render(request, 'tutor_students/students_index.html', {'errors': e})
 
         return redirect('tutor_students:index')
 

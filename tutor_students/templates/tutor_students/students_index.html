@@ -44,16 +44,15 @@
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </button>
                                     </form>
-{##}
-{#                                    <!-- Delete Project -->#}
-{#                                    <form action="{% url 'tutor_projects:project-update' project.id %}" method="get"#}
-{#                                          style="display: inline;">#}
-{#                                        {% csrf_token %}#}
-{#                                        <input type="hidden" name="project_id" value="{{ project.id }}"/>#}
-{#                                        <button type="submit" class="btn btn-default btn-sm">#}
-{#                                            <span class="glyphicon glyphicon-edit"></span>#}
-{#                                        </button>#}
-{#                                    </form>#}
+
+                                    <form action="{% url 'tutor_students:student-update' student.id %}" method="get"
+                                          style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="student_id" value="{{ student.id }}"/>
+                                        <button type="submit" class="btn btn-default btn-sm">
+                                            <span class="glyphicon glyphicon-edit"></span>
+                                        </button>
+                                    </form>
                                 </div><br>
                                 <hr>
                             {% endfor %}
