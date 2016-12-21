@@ -32,8 +32,8 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Wybór przedmiotu<span
                             class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        {% if courses %}
-                            {% for course in courses %}
+                        {% if request.session.courses %}
+                            {% for course in request.session.courses %}
                                 <li><a href="{% url 'tutor:select-course' course.id %}">{{ course.short_name }}</a></li>
                                 <li class="divider"></li>
                             {% endfor %}

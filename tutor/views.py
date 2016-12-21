@@ -26,5 +26,6 @@ class IndexView(View):
         user_profile = UserProfile.objects.get(user=request.user)
         tutor = TutorUser.objects.get(profile_id=user_profile.id)
         tutor_courses = tutor.courses.all()
-        return render(request, self.template_name, {'all_posts': all_posts, 'courses': tutor_courses})
+        request.session['courses'] = tutor_courses
+        return render(request, self.template_name, {'all_posts': all_posts})
 
