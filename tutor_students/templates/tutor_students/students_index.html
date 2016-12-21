@@ -27,7 +27,7 @@
                     <div class="panel-body">
                         {% if request.session.notAddedStudents %}
                             <div class="alert alert-warning">
-                                Niektórzy studenci nie zostali dodani ponieważ już istnieją w systemie:
+                                Niektórzy studenci nie zostali dodani ponieważ już istnieją w systemie:<br>
                                 {% for notAdded in request.session.notAddedStudents %}
                                     {{ notAdded }}<br>
                                 {% endfor %}

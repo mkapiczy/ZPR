@@ -30,7 +30,7 @@ class StudentsView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
-        if(request.session.get('delayClearParam') is not None):
+        if (request.session.get('delayClearParam') is not None):
             request.session['delayClearParam'] = None
         else:
             request.session['notAddedStudents'] = None
@@ -40,34 +40,6 @@ class StudentsView(View):
             return render(request, self.template_name, {'course_students': course_students})
         else:
             return redirect('tutor:index')
-
-
-def read_students_from_file(request):
-    file = TextIOWrapper(request.FILES['students_file'].file, encoding='utf-8')
-    reader = csv.reader(file, delimiter=';')
-    notAddedUsers = []
-    for row in reader:
-        if (row):
-            if (len(row) > 1 and not re.match("Nr", row[0])):
-                first_name = row[2].split(' ', 1)[0]
-                last_name = row[1]
-                album_number = row[3]
-                group = row[6]
-
-                try:
-                    user = createSystemUser(first_name, last_name, album_number)
-                    if user is not None:
-                        myUser = createMyUser(user)
-                        profile = createNewUserProfile(myUser)
-                        createNewStudentUser(profile, album_number, group, request)
-                    else:
-                        notAddedUsers.append(first_name + ' ' + last_name)
-                except IntegrityError as e:
-                    notAddedUsers.append([first_name + ' ' + last_name])
-                    pass
-    request.session['delayClearParam'] = True
-    request.session['notAddedStudents'] = notAddedUsers
-    return redirect('tutor_students:index')
 
 
 class CreateStudent(View):
@@ -86,16 +58,20 @@ class CreateStudent(View):
             last_name = form.cleaned_data['last_name']
             album_number = form.cleaned_data['album_number']
             group = form.cleaned_data['group']
-
+            notAddedStudents = []
             try:
                 user = createSystemUser(first_name, last_name, album_number)
-                if(user is not None):
+                if (user is not None):
                     myUser = createMyUser(user)
                     profile = createNewUserProfile(myUser)
                     createNewStudentUser(profile, album_number, group, request)
+                else:
+                    if (not addStudentToSelectedCourse(album_number, request)):
+                        notAddedStudents.append(first_name + ' ' + last_name)
             except IntegrityError as e:
                 return uniqueContraintValidationRedirect(self, request, form)
 
+        setNotAddedStudentsRequestParam(notAddedStudents, request)
         return redirect('tutor_students:index')
 
 
@@ -155,7 +131,7 @@ class DeleteStudent(View):
                 myUser.delete()
                 user.delete()
             except User.DoesNotExist:
-                messages.error(request, "User doesnot exist")
+                messages.error(request, "User does not exist")
                 return render(request, 'tutor_students/students_index.html')
 
             except Exception as e:
@@ -163,6 +139,38 @@ class DeleteStudent(View):
 
         return redirect('tutor_students:index')
 
+
+def read_students_from_file(request):
+    file = TextIOWrapper(request.FILES['students_file'].file, encoding='utf-8')
+    reader = csv.reader(file, delimiter=';')
+    notAddedStudents = []
+    for row in reader:
+        if (row):
+            if (len(row) > 1 and not re.match("Nr", row[0])):
+                first_name = row[2].split(' ', 1)[0]
+                last_name = row[1]
+                album_number = row[3]
+                group = row[6]
+
+                try:
+                    user = createSystemUser(first_name, last_name, album_number)
+                    if user is not None:
+                        myUser = createMyUser(user)
+                        profile = createNewUserProfile(myUser)
+                        createNewStudentUser(profile, album_number, group, request)
+                    else:
+                        if(not addStudentToSelectedCourse(album_number,request)):
+                            notAddedStudents.append(first_name + ' ' + last_name)
+                except IntegrityError as e:
+                    notAddedStudents.append([first_name + ' ' + last_name])
+                    pass
+    setNotAddedStudentsRequestParam(notAddedStudents,request)
+    return redirect('tutor_students:index')
+
+
+def setNotAddedStudentsRequestParam(notAddedStudents, request):
+    request.session['delayClearParam'] = True
+    request.session['notAddedStudents'] = notAddedStudents
 
 def createSystemUser(first_name, last_name, album_number):
     password = album_number
@@ -223,3 +231,14 @@ def createNewStudentUser(profile, album_number, group, request):
         student.course = []
         student.save()
         student.courses.add(course)
+
+
+def addStudentToSelectedCourse(album_number, request):
+    student = get_object_or_404(StudentUser, album_number=album_number)
+    course_id = request.session.get('selected_course_id')
+    course = get_object_or_404(Course, id=course_id)
+    if student.courses.filter(id=course_id).exists():
+        return False
+    else:
+        student.courses.add(course)
+        return True
