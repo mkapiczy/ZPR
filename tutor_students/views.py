@@ -2,6 +2,7 @@ import csv
 from io import TextIOWrapper
 from sqlite3 import IntegrityError
 
+import re
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -29,6 +30,10 @@ class StudentsView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
+        if(request.session.get('delayClearParam') is not None):
+            request.session['delayClearParam'] = None
+        else:
+            request.session['notAddedStudents'] = None
         selected_course_id = request.session.get('selected_course_id')
         if (selected_course_id is not None):
             course_students = StudentUser.objects.filter(courses__in=[selected_course_id])
@@ -37,21 +42,31 @@ class StudentsView(View):
             return redirect('tutor:index')
 
 
-def read_projects_from_file(request):
-    file = request.FILES['projects_file']
-    # print(request.FILES['projects_file'].read())
-    #
+def read_students_from_file(request):
     file = TextIOWrapper(request.FILES['students_file'].file, encoding='utf-8')
-
-    reader = csv.reader(file, delimiter=',')
-    descriptions = []
+    reader = csv.reader(file, delimiter=';')
+    notAddedUsers = []
     for row in reader:
         if (row):
-            descriptions.append(row)
+            if (len(row) > 1 and not re.match("Nr", row[0])):
+                first_name = row[2].split(' ', 1)[0]
+                last_name = row[1]
+                album_number = row[3]
+                group = row[6]
 
-    print(len(descriptions))
-    request.session['desc'] = descriptions
-
+                try:
+                    user = createSystemUser(first_name, last_name, album_number)
+                    if user is not None:
+                        myUser = createMyUser(user)
+                        profile = createNewUserProfile(myUser)
+                        createNewStudentUser(profile, album_number, group, request)
+                    else:
+                        notAddedUsers.append(first_name + ' ' + last_name)
+                except IntegrityError as e:
+                    notAddedUsers.append([first_name + ' ' + last_name])
+                    pass
+    request.session['delayClearParam'] = True
+    request.session['notAddedStudents'] = notAddedUsers
     return redirect('tutor_students:index')
 
 
@@ -72,19 +87,12 @@ class CreateStudent(View):
             album_number = form.cleaned_data['album_number']
             group = form.cleaned_data['group']
 
-            password = album_number
-            username = first_name + last_name
-
-            user = User.objects.create(username=username,
-                                       email='jlennon@beatles.com',
-                                       password=password,
-                                       first_name=first_name,
-                                       last_name=last_name)
             try:
-                user.save()
-                myUser = createMyUser(user)
-                profile = createNewUserProfile(myUser)
-                createNewStudentUser(profile, album_number, group, request)
+                user = createSystemUser(first_name, last_name, album_number)
+                if(user is not None):
+                    myUser = createMyUser(user)
+                    profile = createNewUserProfile(myUser)
+                    createNewStudentUser(profile, album_number, group, request)
             except IntegrityError as e:
                 return uniqueContraintValidationRedirect(self, request, form)
 
@@ -94,7 +102,6 @@ class CreateStudent(View):
 class UpdateStudent(View):
     form_class = StudentForm
     template_name = 'tutor_students/student_form.html'
-
 
     def get(self, request, pk):
         student_id = request.GET['student_id']
@@ -157,34 +164,62 @@ class DeleteStudent(View):
         return redirect('tutor_students:index')
 
 
+def createSystemUser(first_name, last_name, album_number):
+    password = album_number
+    username = first_name + last_name
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        user = User.objects.create(username=username,
+                                   email='jlennon@beatles.com',
+                                   password=password,
+                                   first_name=first_name,
+                                   last_name=last_name)
+        user.save()
+        return user
+
+    return None
+
+
 def createMyUser(user):
-    myUser = MyUser()
-    myUser.username = user.username
-    myUser.first_name = user.first_name
-    myUser.last_name = user.last_name
-    myUser.set_password(user.password)
-    myUser.user = user
-    myUser.save()
-    return myUser
+    try:
+        myUser = MyUser.objects.get(username=user.username)
+    except MyUser.DoesNotExist:
+        myUser = MyUser()
+        myUser.username = user.username
+        myUser.first_name = user.first_name
+        myUser.last_name = user.last_name
+        myUser.set_password(user.password)
+        myUser.user = user
+        myUser.save()
+        return myUser
+    return None
 
 
 def createNewUserProfile(user):
-    profile = UserProfile()
-    profile.user = user
-    profile.username = user.username
-    profile.first_name = user.first_name
-    profile.last_name = user.last_name
-    profile.save()
-    return profile
+    try:
+        profile = UserProfile.objects.get(user=user)
+    except UserProfile.DoesNotExist:
+        profile = UserProfile()
+        profile.user = user
+        profile.username = user.username
+        profile.first_name = user.first_name
+        profile.last_name = user.last_name
+        profile.save()
+        return profile
+    return None
 
 
 def createNewStudentUser(profile, album_number, group, request):
-    student = StudentUser()
-    student.profile = profile
-    student.album_number = album_number
-    student.group = group
-    course_id = request.session.get('selected_course_id')
-    course = get_object_or_404(Course, id=course_id)
-    student.course = []
-    student.save()
-    student.courses.add(course)
+    try:
+        student = StudentUser.objects.get(profile=profile)
+    except StudentUser.DoesNotExist:
+        student = StudentUser()
+        student.profile = profile
+        student.album_number = album_number
+        student.group = group
+        course_id = request.session.get('selected_course_id')
+        course = get_object_or_404(Course, id=course_id)
+        student.course = []
+        student.save()
+        student.courses.add(course)

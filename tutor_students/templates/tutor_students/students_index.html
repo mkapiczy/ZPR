@@ -5,10 +5,10 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12 col-md-12">
-                <form class="form-horizontal" action="{% url 'tutor_projects:read_projects_from_file' %}"
+                <form class="form-horizontal" action="{% url 'tutor_students:read_students_from_file' %}"
                       method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <input type="file" name="projects_file"/>
+                    <input type="file" name="students_file"/>
                     <br>
                     <div class="form-group">
                         <div class="col-sm-10">
@@ -25,16 +25,25 @@
 
                 <div class="panel panel-default">
                     <div class="panel-body">
-
+                        {% if request.session.notAddedStudents %}
+                            <div class="alert alert-warning">
+                                Niektórzy studenci nie zostali dodani ponieważ już istnieją w systemie:
+                                {% for notAdded in request.session.notAddedStudents %}
+                                    {{ notAdded }}<br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         <div class="thumbnail caption">
                             Lista studentów
                         </div>
+                        <hr>
                         {% if course_students %}
                             {% for student in course_students %}
                                 <div class="caption">
                                     Login użytkownika: {{ student.profile.username }}<br><br>
-                                    Nr albumu: {{ student.album_number}} <br><br>
-                                    Imię i nazwisko: {{ student.profile.first_name }} {{ student.profile.last_name }}<br><br>
+                                    Nr albumu: {{ student.album_number }} <br><br>
+                                    Imię i
+                                    nazwisko: {{ student.profile.first_name }} {{ student.profile.last_name }}<br><br>
                                     <!-- Delete Project -->
                                     <form action="{% url 'tutor_students:student-delete' student.id %}" method="post"
                                           style="display: inline;">
