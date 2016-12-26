@@ -22,10 +22,19 @@ class IndexView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
-        all_posts = Post.objects.all()
+        posts = []
+        if 'selected_course_id' in request.session:
+            selected_course_id = request.session.get('selected_course_id')
+            try:
+                posts = Post.objects.filter(course=selected_course_id)
+            except Post.DoesNotExist:
+                pass
+        else:
+            posts = Post.objects.all()
+
         user_profile = UserProfile.objects.get(user=request.user)
         tutor = TutorUser.objects.get(profile_id=user_profile.id)
         tutor_courses = tutor.courses.all()
         request.session['courses'] = tutor_courses
-        return render(request, self.template_name, {'all_posts': all_posts})
+        return render(request, self.template_name, {'posts': posts})
 

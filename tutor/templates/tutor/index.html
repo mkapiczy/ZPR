@@ -21,8 +21,8 @@
     </a> <br><br>
 
 
-    {% if all_posts %}
-        {% for post in all_posts %}
+    {% if posts %}
+        {% for post in posts %}
             <div class="col-sm-12">
                 <div class="thumbnail">
                     <div class="caption">
@@ -53,13 +53,5 @@
             </div>
         {% endfor %}
     {% else %}
-        <div class="col-sm-12">
-            <br>
-            <a href="{% url 'student:album-add' %}">
-                <button type="button" class="btn btn-success">
-                    <span class="glyphicon glyphicon-plus"></span>&nbsp; Add an Album
-                </button>
-            </a>
-        </div>
     {% endif %}
 {% endblock %}
