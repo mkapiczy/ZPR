@@ -41,6 +41,7 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=5000)
     allowed_teams_number = models.IntegerField(default=1)
+    minimum_students_number = models.IntegerField(default=2)
     allowed_students_number = models.IntegerField(default=3)
     available = models.BooleanField(default=True)
     course = models.ForeignKey(Course)

@@ -35,6 +35,7 @@
                                     Nazwa projektu: {{ project.name }} <br><br>
                                     Opis projektu: {{ project.description }}<br><br>
                                     Liczba dozwolonych zespołów: {{ project.allowed_teams_number }}<br>
+                                    Minimalna liczba osób w zespole: {{ project.minimum_students_number }}<br>
                                     Liczba dozwolonych osób w zespole: {{ project.allowed_students_number }}<br><br>
                                     <!-- Delete Project -->
                                     <form action="{% url 'tutor_projects:project-delete' project.id %}" method="post"
