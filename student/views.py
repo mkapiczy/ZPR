@@ -7,6 +7,7 @@ from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import HttpResponseForbidden
 from main.models import UserProfile
+from main_posts.models import Post
 from .models import Album, StudentUser
 from main.permissions import has_student_permissions
 
@@ -24,12 +25,22 @@ class IndexView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
-        all_albums = Album.objects.all()
+        posts = []
+        if 'selected_course_id' in request.session:
+            selected_course_id = request.session.get('selected_course_id')
+            try:
+                posts = Post.objects.filter(course=selected_course_id)
+            except Post.DoesNotExist:
+                pass
+        else:
+            posts = Post.objects.all()
+
         user_profile = UserProfile.objects.get(user=request.user)
         student = StudentUser.objects.get(profile_id=user_profile.id)
         student_courses = student.courses.all()
         request.session['courses'] = student_courses
-        return render(request, self.template_name, {'all_albums': all_albums, 'courses': student_courses})
+        return render(request, self.template_name, {'posts': posts})
+
 
 
 class DetailView(generic.DetailView):

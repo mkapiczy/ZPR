@@ -17,10 +17,11 @@ class UserProfile(models.Model):
     last_name = models.CharField(max_length=255)
 
     def is_student_user(self):
-        if self.user.is_tutor:
-            return False
-        else:
+        print(self.user.id)
+        if not self.user.is_tutor:
             return True
+        else:
+            return False
 
     def is_tutor_user(self):
         if self.user.is_tutor:

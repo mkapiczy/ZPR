@@ -1,0 +1,29 @@
+<!DOC{% extends 'student/base.html' %}
+{% block title %}Lista projektów{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="thumbnail caption">
+                            Lista projektów
+                        </div>
+                        {% if course_projects %}
+                            {% for project in course_projects %}
+                                <div class="caption">
+                                    Nazwa projektu: {{ project.name }} <br><br>
+                                    Opis projektu: {{ project.description }}<br><br>
+
+                                </div><br>
+                                <hr>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
