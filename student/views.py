@@ -35,13 +35,15 @@ class IndexView(View):
         else:
             posts = Post.objects.all()
 
-        user_profile = UserProfile.objects.get(user=request.user)
-        student = StudentUser.objects.get(profile_id=user_profile.id)
+        student = get_student_user_from_request(request)
         student_courses = student.courses.all()
         request.session['courses'] = student_courses
         return render(request, self.template_name, {'posts': posts})
 
-
+def get_student_user_from_request(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    student = StudentUser.objects.get(profile_id=user_profile.id)
+    return student
 
 class DetailView(generic.DetailView):
     model = Album
