@@ -1,5 +1,6 @@
 from django.conf.urls import url
 
+from main.views import select_course
 from . import views
 
 app_name = 'student'
@@ -7,6 +8,8 @@ app_name = 'student'
 urlpatterns = [
     # /student/
     url(r'^$', views.IndexView.as_view(), name='index'),
+
+    url(r'^select_course/(?P<course_id>[0-9]+)/$', select_course, name='select-course'),
 
     # /student/{id}/
     url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='detail'),
