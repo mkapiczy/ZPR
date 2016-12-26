@@ -4,7 +4,7 @@ from django.db import models
 from main.models import UserProfile, Project, Course
 
 class ProjectTeam(models.Model):
-    project = models.OneToOneField(Project)
+    project = models.ForeignKey(Project)
 
 class StudentUser(models.Model):
     profile = models.ForeignKey(UserProfile)
@@ -14,8 +14,9 @@ class StudentUser(models.Model):
     eres_id = models.CharField(max_length=16)
     status = models.BooleanField
     group = models.CharField(max_length=32)
-    project_team = models.ForeignKey(ProjectTeam, null=True)
     courses = models.ManyToManyField(Course)
+    project_team = models.ForeignKey(ProjectTeam, null=True)
+    signed_project = models.ForeignKey('main.Project', null=True)
 
     class Meta:
         db_table = 'student_user'

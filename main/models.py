@@ -44,9 +44,6 @@ class Project(models.Model):
     allowed_students_number = models.IntegerField(default=3)
     available = models.BooleanField(default=True)
     course = models.ForeignKey(Course)
-    signed_students = models.ForeignKey('student.StudentUser', null=True)
-    # project_team = models.OneToOneField('student.ProjectTeam')
-    # OneToMany
     tutor = models.ForeignKey('tutor.TutorUser')
 
 
