@@ -1,0 +1,33 @@
+{% extends 'tutor/base.html' %}
+{% block title %}Utwórz zespół{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-7">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        {% if custom_errors %}
+                            {% for error in custom_errors %}
+                                <div class="alert alert-danger">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                        <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <select multiple style="width: 100%" id="students" name="students">
+                                {% for signed in form.signed_students %}
+                                    <option value="{{ signed.id }}">{{ signed.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="submit" class="btn btn-success">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

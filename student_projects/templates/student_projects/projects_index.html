@@ -32,27 +32,33 @@
                                     {% endif %}
                                 </div><br>
                                 <!-- Sign to Project -->
-                                {% if project.available and project.id != request.session.signed_project_id %}
-                                    <form action="{% url 'student_projects:project-sign' project.id %}" method="post"
-                                          style="display: inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="project_id" value="{{ project.id }}"/>
-                                        <button type="submit" class="btn btn-primary btn-large label label-warning">
-                                            <span class="glyphicon glyphicon-ok"> Zapisz się na projekt</span>
-                                        </button>
-                                    </form>
-                                {% else %}
-                                    {% if project.studentuser_set.all|length >= project.minimum_students_number %}
+                                {% if project.available %}
+                                    {% if  project.id != request.session.signed_project_id and not request.session.student_team_registered %}
                                         <form action="{% url 'student_projects:project-sign' project.id %}"
                                               method="post"
                                               style="display: inline;">
                                             {% csrf_token %}
                                             <input type="hidden" name="project_id" value="{{ project.id }}"/>
                                             <button type="submit" class="btn btn-primary btn-large label label-warning">
-                                                <span class="glyphicon glyphicon-ok"> Utwórz zespół</span>
+                                                <span class="glyphicon glyphicon-ok"> Zapisz się na projekt</span>
                                             </button>
                                         </form>
+                                    {% else %}
+                                        {% if project.studentuser_set.all|length >= project.minimum_students_number and not request.session.student_team_registered %}
+                                            <form action="{% url 'student_projects:project-create-team' project.id %}"
+                                                  method="get"
+                                                  style="display: inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="project_id" value="{{ project.id }}"/>
+                                                <button type="submit"
+                                                        class="btn btn-primary btn-large label label-warning">
+                                                    <span class="glyphicon glyphicon-ok"> Utwórz zespół</span>
+                                                </button>
+                                            </form>
+                                        {% endif %}
                                     {% endif %}
+                                {% else %}
+                                    <div class="label label-danger">Projekt zajęty</div>
                                 {% endif %}
                                 <hr>
                             {% endfor %}
