@@ -67,26 +67,19 @@ class CreateProjectTeamView(View):
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, pk):
-        form = self.form_class(request.POST)
-        project_id = pk
-        project = get_object_or_404(Project, id=project_id)
-
+        project = get_object_or_404(Project, id=pk)
         chosen_students = self.get_chosen_students_from_request(request)
 
         if self.chosen_students_are_valid(chosen_students, project):
-            project_team = ProjectTeam()
-            project_team.project = project
-            project_team.save()
-            project.available = False
-            project.save()
-            for student in project.studentuser_set.all():
-                student.signed_project = None
-                student.save()
+            project_team = create_project_team(project)
+            set_project_unavailable(project)
+            clear_project_signed_users_set(project)
 
             for student in chosen_students:
                 student.project_team = project_team
                 student.signed_project = project
                 student.save()
+
             return redirect('student_projects:projects')
         else:
             form = self.populate_form(pk)
@@ -119,3 +112,18 @@ class CreateProjectTeamView(View):
         for student_id in students:
             chosen_students.append(StudentUser.objects.get(id=student_id))
         return chosen_students
+
+def create_project_team(project):
+    project_team = ProjectTeam()
+    project_team.project = project
+    project_team.save()
+    return project
+
+def set_project_unavailable(project):
+    project.available = False
+    project.save()
+
+def clear_project_signed_users_set(project):
+    for student in project.studentuser_set.all():
+        student.signed_project = None
+        student.save()
