@@ -4,15 +4,13 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from main.models import UserProfile
-from main_posts.models import Post
 from main.permissions import has_tutor_permissions
-from .models import TutorUser
+from main_posts.models import Post
+from tutor.methods import get_tutor_user_from_request
 
 
 class IndexView(View):
     template_name = 'tutor/index.html'
-    login_url = 'main:login'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -32,9 +30,9 @@ class IndexView(View):
         else:
             posts = Post.objects.all()
 
-        user_profile = UserProfile.objects.get(user=request.user)
-        tutor = TutorUser.objects.get(profile_id=user_profile.id)
+        tutor = get_tutor_user_from_request(request)
         tutor_courses = tutor.courses.all()
         request.session['courses'] = tutor_courses
         return render(request, self.template_name, {'posts': posts})
+
 

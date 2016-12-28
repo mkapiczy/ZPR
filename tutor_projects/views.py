@@ -11,10 +11,10 @@ from django.views import View
 from django.views.generic import DeleteView
 from django.views.generic import UpdateView
 
-from main.models import Project, Course, MyUser, UserProfile
+from main.models import Project
 from main.permissions import has_tutor_permissions
-from tutor.models import TutorUser
 from tutor_projects.forms import ProjectForm
+from tutor_projects.methods import set_project_available, saveProject
 
 
 class ProjectsView(View):
@@ -78,19 +78,6 @@ class ProjectCreate(View):
 
             return redirect('tutor_projects:projects')
 
-def saveProject(project, request):
-    course_id = request.session.get('selected_course_id')
-    course = get_object_or_404(Course, id=course_id)
-    project.course = course
-
-    myUser = get_object_or_404(MyUser, user=request.user)
-    userProfile = get_object_or_404(UserProfile, user=myUser)
-    userTutor = get_object_or_404(TutorUser, profile=userProfile)
-    project.tutor = userTutor
-
-    project.save()
-
-
 class ProjectUpdate(UpdateView):
     template_name = 'tutor_projects/project_form.html'
     form_class = ProjectForm
@@ -100,8 +87,6 @@ class ProjectUpdate(UpdateView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(ProjectUpdate, self).dispatch(request, *args, **kwargs)
-
-
 
 class ProjectDelete(DeleteView):
     model = Project
@@ -124,8 +109,6 @@ def vacate_project(request, pk):
     set_project_available(project)
     return redirect('tutor_projects:projects')
 
-def set_project_available(project):
-    project.available = True
-    project.save()
+
 
 
