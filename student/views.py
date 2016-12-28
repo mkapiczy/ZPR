@@ -4,16 +4,14 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from main.models import UserProfile
 from main.permissions import has_student_permissions
 from main_posts.models import Post
-from student_inbox.views import get_student_messages, refresh_inbox_status
-from .models import StudentUser
+from student.methods import get_student_user_from_request
+from student_inbox.methods import refresh_inbox_status
 
 
 class IndexView(View):
     template_name = 'student/index.html'
-    context_object_name = 'all_albums'
     login_url = 'main:login'
 
     @method_decorator(login_required)
@@ -39,10 +37,4 @@ class IndexView(View):
         request.session['courses'] = student_courses
         refresh_inbox_status(request, student)
         return render(request, self.template_name, {'posts': posts})
-
-
-def get_student_user_from_request(request):
-    user_profile = UserProfile.objects.get(user=request.user)
-    student = StudentUser.objects.get(profile_id=user_profile.id)
-    return student
 

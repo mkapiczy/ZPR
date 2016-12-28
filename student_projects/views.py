@@ -3,18 +3,19 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
-from main.models import Project, NewProjectTeamRequest, NewProjectTeamMessage, Message, UserInbox
 
-from main.permissions import has_student_permissions, has_tutor_permissions
-from student.models import StudentUser, ProjectTeam
+from main.models import Project, NewProjectTeamMessage, Message
+from main.permissions import has_student_permissions
+from student.models import StudentUser
 from student.views import get_student_user_from_request
-from student_inbox.views import refresh_inbox_status
+from student_inbox.methods import refresh_inbox_status
 from student_projects.forms import CreateProjectTeamForm, SignedStudent
+from student_projects.methods import get_student_inbox_or_create_if_none, create_new_project_team_request, \
+    create_project_team
 
 
 class ProjectsView(View):
     template_name = 'student_projects/projects_index.html'
-    index_template = 'student/index.html'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -27,16 +28,16 @@ class ProjectsView(View):
         selected_course_id = request.session.get('selected_course_id')
         if (selected_course_id is not None):
             course_projects = Project.objects.filter(course=selected_course_id)
-            for project in course_projects:
-                if (project.studentuser_set):
-                    for student in project.studentuser_set.all():
-                        print(student.album_number)
+
             student = get_student_user_from_request(request)
             student_signed_project = student.signed_project
+
             if student_signed_project is not None:
                 request.session['signed_project_id'] = student_signed_project.id
+
             if (student.project_team is not None):
                 request.session['student_team_registered'] = True
+
             refresh_inbox_status(request, student)
             return render(request, self.template_name, {'course_projects': course_projects})
         else:
@@ -55,7 +56,6 @@ def sing_to_project(request, pk):
 class CreateProjectTeamView(View):
     form_class = CreateProjectTeamForm
     template_name = 'student_projects/create_team_form.html'
-    index_template = 'student_projects/projects_index.html'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -126,34 +126,3 @@ class CreateProjectTeamView(View):
             chosen_students.append(StudentUser.objects.get(id=student_id))
         return chosen_students
 
-
-def create_project_team(project):
-    project_team = ProjectTeam()
-    project_team.project = project
-    project_team.save()
-    return project_team
-
-
-def create_new_project_team_request(project_team):
-    new_team_request = NewProjectTeamRequest()
-    new_team_request.project_team = project_team
-    new_team_request.save()
-    return new_team_request
-
-def get_student_inbox_or_create_if_none(student):
-    if student.profile.inbox is None:
-        inbox = UserInbox(user_profile=student.profile)
-        inbox.save()
-        student.profile.inbox = inbox
-        student.save()
-    return student.profile.inbox
-
-def set_project_unavailable(project):
-    project.available = False
-    project.save()
-
-
-def clear_project_signed_users_set(project):
-    for student in project.studentuser_set.all():
-        student.signed_project = None
-        student.save()

@@ -4,14 +4,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from main.models import UserProfile, NewProjectTeamMessage
+from main.models import NewProjectTeamMessage
 from main.permissions import has_student_permissions
-from student.models import StudentUser
+from student.methods import get_student_user_from_request
+from student_inbox.methods import get_student_messages, refresh_inbox_status
 
 
 class InboxView(View):
     template_name = 'student_inbox/inbox_index.html'
-    index_template = 'student/index.html'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -29,24 +29,6 @@ class InboxView(View):
             return render(request, self.template_name, {'inbox': inbox})
         else:
             return redirect('student_inbox:index')
-
-
-def get_student_messages(student):
-    messages = []
-    if student.profile.inbox and student.profile.inbox.newprojectteammessage_set:
-        for msg in student.profile.inbox.newprojectteammessage_set.all():
-            messages.append(msg)
-    return messages
-
-def refresh_inbox_status(request, student):
-    inbox = get_student_messages(student)
-    request.session['inbox'] = inbox
-    request.session['unread_messages_size'] = len(inbox)
-
-def get_student_user_from_request(request):
-    user_profile = UserProfile.objects.get(user=request.user)
-    student = StudentUser.objects.get(profile_id=user_profile.id)
-    return student
 
 
 def accept_project_team(request, pk):
