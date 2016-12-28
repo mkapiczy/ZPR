@@ -49,25 +49,28 @@
                                             {% endfor %}
                                         </ul>
                                     {% endif %}
-                                    <!-- Delete Project -->
-                                    <form action="{% url 'tutor_projects:project-delete' project.id %}" method="post"
-                                          style="display: inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="project_id" value="{{ project.id }}"/>
-                                        <button type="submit" class="btn btn-default btn-sm">
-                                            <span class="glyphicon glyphicon-trash"> Usuń</span>
-                                        </button>
-                                    </form>
+                                    {% if project.available %}
+                                        <!-- Delete Project -->
+                                        <form action="{% url 'tutor_projects:project-delete' project.id %}"
+                                              method="post"
+                                              style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="project_id" value="{{ project.id }}"/>
+                                            <button type="submit" class="btn btn-default btn-sm">
+                                                <span class="glyphicon glyphicon-trash"> Usuń</span>
+                                            </button>
+                                        </form>
 
-                                    <!-- Edit Project -->
-                                    <form action="{% url 'tutor_projects:project-update' project.id %}" method="get"
-                                          style="display: inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="project_id" value="{{ project.id }}"/>
-                                        <button type="submit" class="btn btn-default btn-sm">
-                                            <span class="glyphicon glyphicon-edit"> Edytuj</span>
-                                        </button>
-                                    </form>
+                                        <!-- Edit Project -->
+                                        <form action="{% url 'tutor_projects:project-update' project.id %}" method="get"
+                                              style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="project_id" value="{{ project.id }}"/>
+                                            <button type="submit" class="btn btn-default btn-sm">
+                                                <span class="glyphicon glyphicon-edit"> Edytuj</span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                     {% if not project.available %}
                                         <form action="{% url 'tutor_projects:project-vacate' project.id %}"
                                               method="post"
