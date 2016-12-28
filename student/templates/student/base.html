@@ -52,16 +52,19 @@
             </ul>
 
             <ul class="nav navbar-nav nav navbar-right">
-                {% if request.session.inbox %}
-                    <li class="">
-                        <a href="{% url 'student_inbox:index' %}">
-                            <span class="glyphicon glyphicon-inbox" aria-hidden="true"></span>&nbsp;
-                            ({{ request.session.unread_messages_size }})
-                        </a>
-                    </li>
-                {% endif %}
                 <li class="">
-                    <a href="{% url 'main:logout'%}">
+                    <a href="{% url 'student_inbox:index' %}">
+                        <span class="glyphicon glyphicon-inbox" aria-hidden="true"></span>&nbsp;
+                        {% if request.session.inbox %}
+                            ({{ request.session.unread_messages_size }})
+                        {% else %}
+                            (0)
+                        {% endif %}
+                    </a>
+                </li>
+
+                <li class="">
+                    <a href="{% url 'main:logout' %}">
                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;
                         Profil
                     </a>
