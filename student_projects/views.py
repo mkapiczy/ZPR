@@ -3,7 +3,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
-from main.models import Project
+from main.models import Project, NewProjectTeamRequest, NewProjectTeamMessage, Message, UserInbox
 
 from main.permissions import has_student_permissions, has_tutor_permissions
 from student.models import StudentUser, ProjectTeam
@@ -34,7 +34,7 @@ class ProjectsView(View):
             student_signed_project = student.signed_project
             if student_signed_project is not None:
                 request.session['signed_project_id'] = student_signed_project.id
-            if(student.project_team is not None):
+            if (student.project_team is not None):
                 request.session['student_team_registered'] = True
             return render(request, self.template_name, {'course_projects': course_projects})
         else:
@@ -72,11 +72,22 @@ class CreateProjectTeamView(View):
 
         if self.chosen_students_are_valid(chosen_students, project):
             project_team = create_project_team(project)
-            set_project_unavailable(project)
-            clear_project_signed_users_set(project)
+
+            new_team_request = create_new_project_team_request(project_team)
+
+            message = Message(title = 'Grupa projektowa', text='Czy chcesz zaakceptować zaproszenie do krupy projektowej?')
+            message.save()
 
             for student in chosen_students:
-                student.project_team = project_team
+                new_team_message = NewProjectTeamMessage()
+                new_team_message.request = new_team_request
+                new_team_message.message = message
+
+                student_inbox = get_student_inbox_or_create_if_none(student)
+
+                new_team_message.user_inbox = student_inbox
+                new_team_message.save()
+
                 student.signed_project = project
                 student.save()
 
@@ -113,15 +124,32 @@ class CreateProjectTeamView(View):
             chosen_students.append(StudentUser.objects.get(id=student_id))
         return chosen_students
 
+
 def create_project_team(project):
     project_team = ProjectTeam()
     project_team.project = project
     project_team.save()
     return project_team
 
+
+def create_new_project_team_request(project_team):
+    new_team_request = NewProjectTeamRequest()
+    new_team_request.project_team = project_team
+    new_team_request.save()
+    return new_team_request
+
+def get_student_inbox_or_create_if_none(student):
+    if student.profile.inbox is None:
+        inbox = UserInbox(user_profile=student.profile)
+        inbox.save()
+        student.profile.inbox = inbox
+        student.save()
+    return student.profile.inbox
+
 def set_project_unavailable(project):
     project.available = False
     project.save()
+
 
 def clear_project_signed_users_set(project):
     for student in project.studentuser_set.all():

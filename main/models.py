@@ -2,7 +2,6 @@ from django.contrib.auth.models import (AbstractBaseUser)
 from django.contrib.auth.models import User
 from django.db import models
 
-
 class MyUser(User):
     # common fields
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -16,6 +15,8 @@ class UserProfile(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
 
+    inbox = models.OneToOneField('UserInbox', null=True)
+
     def is_student_user(self):
         print(self.user.id)
         if not self.user.is_tutor:
@@ -28,6 +29,36 @@ class UserProfile(models.Model):
             return True
         else:
             return False
+
+
+
+
+class UserInbox(models.Model):
+    user_profile = models.OneToOneField('UserProfile')
+
+
+class BasicUserMessage(models.Model):
+    user_inbox = models.ForeignKey('UserInbox')
+    message = models.OneToOneField('Message')
+    read = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True
+
+
+class NewProjectTeamMessage(BasicUserMessage):
+    accepted = models.BooleanField(default=False)
+    request = models.ForeignKey('NewProjectTeamRequest')
+
+
+class NewProjectTeamRequest(models.Model):
+    project_team = models.ForeignKey('student.ProjectTeam')
+    accepted = models.BooleanField(default=False)
+
+
+class Message(models.Model):
+    title = models.CharField(max_length=255)
+    text = models.CharField(max_length=510)
 
 
 class Course(models.Model):
@@ -46,6 +77,3 @@ class Project(models.Model):
     available = models.BooleanField(default=True)
     course = models.ForeignKey(Course)
     tutor = models.ForeignKey('tutor.TutorUser')
-
-
-

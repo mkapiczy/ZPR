@@ -11,8 +11,18 @@
 
     </div>
 
-
-     {% if posts %}
+    {% if request.session.inbox %}
+        <div class="col-sm-12">
+            <div class="caption">
+                {% for msg in request.session.inbox %}
+                    {{ msg.message.title }} <br>
+                    {{ msg.message.text }}<br><br>
+                    <hr>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    {% if posts %}
         {% for post in posts %}
             <div class="col-sm-12">
                 <div class="thumbnail">

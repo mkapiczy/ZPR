@@ -1,13 +1,16 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from main.models import UserProfile, Project, Course
+from main.models import Project, Course
+
 
 class ProjectTeam(models.Model):
     project = models.ForeignKey(Project)
+    accepted = models.BooleanField(default=False)
+
 
 class StudentUser(models.Model):
-    profile = models.ForeignKey(UserProfile)
+    profile = models.ForeignKey('main.UserProfile')
 
     # studentFields
     album_number = models.CharField(max_length=16)
@@ -20,7 +23,6 @@ class StudentUser(models.Model):
 
     class Meta:
         db_table = 'student_user'
-
 
 
 class Album(models.Model):

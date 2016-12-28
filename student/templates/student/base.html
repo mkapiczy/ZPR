@@ -34,7 +34,8 @@
                     <ul class="dropdown-menu" role="menu">
                         {% if request.session.courses %}
                             {% for course in request.session.courses %}
-                                <li><a href="{% url 'student:select-course' course.id %}">{{ course.short_name }}</a></li>
+                                <li><a href="{% url 'student:select-course' course.id %}">{{ course.short_name }}</a>
+                                </li>
                                 <li class="divider"></li>
                             {% endfor %}
                         {% else %}
@@ -51,12 +52,14 @@
             </ul>
 
             <ul class="nav navbar-nav nav navbar-right">
-                <li class="">
-                    <a href="{% url 'student:album-add' %}">
-                        <span class="glyphicon glyphicon-sunglasses" aria-hidden="true"></span>&nbsp;
-                        Twój zespół
-                    </a>
-                </li>
+                {% if request.session.inbox %}
+                    <li class="">
+                        <a href="{% url 'student:album-add' %}">
+                            <span class="glyphicon glyphicon-inbox" aria-hidden="true"></span>&nbsp;
+                            ({{ request.session.unread_messages_size }})
+                        </a>
+                    </li>
+                {% endif %}
                 <li class="">
                     <a href="{% url 'student:album-add' %}">
                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;

@@ -38,12 +38,19 @@ class IndexView(View):
         student = get_student_user_from_request(request)
         student_courses = student.courses.all()
         request.session['courses'] = student_courses
+
+        inbox = get_student_messages(student)
+        request.session['inbox'] = inbox
+        request.session['unread_messages_size'] = len(inbox)
+
         return render(request, self.template_name, {'posts': posts})
+
 
 def get_student_user_from_request(request):
     user_profile = UserProfile.objects.get(user=request.user)
     student = StudentUser.objects.get(profile_id=user_profile.id)
     return student
+
 
 class DetailView(generic.DetailView):
     model = Album
@@ -80,3 +87,9 @@ class AlbumDelete(DeleteView):
     def dispatch(self, request, *args, **kwargs):
         return super(AlbumDelete, self).dispatch(request, *args, **kwargs)
 
+def get_student_messages(student):
+    messages = []
+    if student.profile.inbox and student.profile.inbox.newprojectteammessage_set:
+        for msg in student.profile.inbox.newprojectteammessage_set.all():
+            messages.append(msg)
+    return messages
