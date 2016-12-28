@@ -55,11 +55,13 @@
                 <li class="">
                     <a href="{% url 'student_inbox:index' %}">
                         <span class="glyphicon glyphicon-inbox" aria-hidden="true"></span>&nbsp;
+                        <span class="badge">
                         {% if request.session.inbox %}
                             ({{ request.session.unread_messages_size }})
                         {% else %}
                             (0)
                         {% endif %}
+                         </span>
                     </a>
                 </li>
 
