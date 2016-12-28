@@ -37,7 +37,9 @@
                                     Liczba dozwolonych zespołów: {{ project.allowed_teams_number }}<br>
                                     Minimalna liczba osób w zespole: {{ project.minimum_students_number }}<br>
                                     Liczba dozwolonych osób w zespole: {{ project.allowed_students_number }}<br>
-                                    Status projektu: {% if project.available %}Dostępny{% else %}Zajęty{% endif %}
+                                    Status projektu: {% if project.available %}
+                                    <div class="label label-success">Dostępny</div>{% else %}
+                                    <div class="label label-danger">Zajęty</div>{% endif %}
                                     <br><br>
                                     {% if project.studentuser_set.all %}
                                         <span class="label label-info">Zapisani studenci:</span> <br>
