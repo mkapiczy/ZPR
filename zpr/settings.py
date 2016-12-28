@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'main_posts.apps.MainPostsConfig',
     'student.apps.StudentConfig',
     'student_projects.apps.StudentProjectsConfig',
+    'student_inbox.apps.StudentInboxConfig',
     'tutor.apps.TutorConfig',
     'tutor_posts.apps.TutorPostsConfig',
     'tutor_projects.apps.TutorProjectsConfig',
