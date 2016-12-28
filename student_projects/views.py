@@ -7,7 +7,8 @@ from main.models import Project, NewProjectTeamRequest, NewProjectTeamMessage, M
 
 from main.permissions import has_student_permissions, has_tutor_permissions
 from student.models import StudentUser, ProjectTeam
-from student.views import get_student_user_from_request, refresh_inbox_status
+from student.views import get_student_user_from_request
+from student_inbox.views import refresh_inbox_status
 from student_projects.forms import CreateProjectTeamForm, SignedStudent
 
 

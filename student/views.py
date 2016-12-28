@@ -7,7 +7,7 @@ from django.views import View
 from main.models import UserProfile
 from main.permissions import has_student_permissions
 from main_posts.models import Post
-from student_inbox.views import get_student_messages
+from student_inbox.views import get_student_messages, refresh_inbox_status
 from .models import StudentUser
 
 
@@ -46,8 +46,3 @@ def get_student_user_from_request(request):
     student = StudentUser.objects.get(profile_id=user_profile.id)
     return student
 
-
-def refresh_inbox_status(request, student):
-    inbox = get_student_messages(student)
-    request.session['inbox'] = inbox
-    request.session['unread_messages_size'] = len(inbox)

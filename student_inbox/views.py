@@ -25,6 +25,7 @@ class InboxView(View):
         if student is not None:
             request.session['isStudentSignedToProject'] = student.project_team is not None
             inbox = get_student_messages(student)
+            refresh_inbox_status(request, student)
             return render(request, self.template_name, {'inbox': inbox})
         else:
             return redirect('student_inbox:index')
@@ -37,6 +38,10 @@ def get_student_messages(student):
             messages.append(msg)
     return messages
 
+def refresh_inbox_status(request, student):
+    inbox = get_student_messages(student)
+    request.session['inbox'] = inbox
+    request.session['unread_messages_size'] = len(inbox)
 
 def get_student_user_from_request(request):
     user_profile = UserProfile.objects.get(user=request.user)
