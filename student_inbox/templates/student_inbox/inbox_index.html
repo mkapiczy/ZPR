@@ -13,9 +13,30 @@
                         {% if inbox %}
                             <div class="col-sm-12">
                                 <div class="caption">
-                                    {% for msg in inbox %}
-                                        {{ msg.message.title }} <br>
-                                        {{ msg.message.text }}<br><br>
+                                    {% for message in inbox %}
+                                        {{ message.message.title }} <br>
+                                        {{ message.message.text }}<br><br>
+
+                                        {% if not isStudentSignedToProject %}
+                                            <form action="{% url 'student_inbox:team-reject' message.id %}"
+                                                  method="post"
+                                                  style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit"
+                                                        class="btn btn-primary btn-large label label-warning">
+                                                    <span class="glyphicon glyphicon-ok"> Odrzuć</span>
+                                                </button>
+                                            </form>
+                                              <form action="{% url 'student_inbox:team-accept' message.id %}"
+                                                  method="post"
+                                                  style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit"
+                                                        class="btn btn-primary btn-large label label-warning">
+                                                    <span class="glyphicon glyphicon-ok"> Zaakceptuj</span>
+                                                </button>
+                                            </form>
+                                        {% endif %}
                                         <hr>
                                     {% endfor %}
                                 </div>
