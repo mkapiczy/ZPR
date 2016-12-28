@@ -17,7 +17,7 @@
                                         {{ message.message.title }} <br>
                                         {{ message.message.text }}<br><br>
 
-                                        {% if not isStudentSignedToProject %}
+                                        {% if not request.session.isStudentSignedToProject %}
                                             <form action="{% url 'student_inbox:team-reject' message.id %}"
                                                   method="post"
                                                   style="display: inline;">
