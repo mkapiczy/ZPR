@@ -31,8 +31,6 @@ class UserProfile(models.Model):
             return False
 
 
-
-
 class UserInbox(models.Model):
     user_profile = models.OneToOneField('UserProfile')
 

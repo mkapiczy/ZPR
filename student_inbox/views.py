@@ -4,8 +4,9 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 
+from main.models import UserProfile
 from main.permissions import has_student_permissions
-from student.views import get_student_user_from_request
+from student.models import StudentUser
 
 
 class InboxView(View):
@@ -34,3 +35,8 @@ def get_student_messages(student):
         for msg in student.profile.inbox.newprojectteammessage_set.all():
             messages.append(msg)
     return messages
+
+def get_student_user_from_request(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    student = StudentUser.objects.get(profile_id=user_profile.id)
+    return student
