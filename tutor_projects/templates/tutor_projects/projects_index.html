@@ -19,7 +19,7 @@
 
                 <a href="{% url 'tutor_projects:project-add' %}">
                     <button type="button" class="btn btn-success">
-                        <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj nowy post
+                        <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj nowy projekt
                     </button>
                 </a> <br><br>
 
@@ -36,14 +36,24 @@
                                     Opis projektu: {{ project.description }}<br><br>
                                     Liczba dozwolonych zespołów: {{ project.allowed_teams_number }}<br>
                                     Minimalna liczba osób w zespole: {{ project.minimum_students_number }}<br>
-                                    Liczba dozwolonych osób w zespole: {{ project.allowed_students_number }}<br><br>
+                                    Liczba dozwolonych osób w zespole: {{ project.allowed_students_number }}<br>
+                                    Status projektu: {% if project.available %}Dostępny{% else %}Zajęty{% endif %}
+                                    <br><br>
+                                    {% if project.studentuser_set.all %}
+                                        <span class="label label-info">Zapisani studenci:</span> <br>
+                                        <ul class="list-group">
+                                            {% for student in project.studentuser_set.all %}
+                                                <li class="list-group-item">{{ student.profile.first_name }} {{ student.profile.last_name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
                                     <!-- Delete Project -->
                                     <form action="{% url 'tutor_projects:project-delete' project.id %}" method="post"
                                           style="display: inline;">
                                         {% csrf_token %}
                                         <input type="hidden" name="project_id" value="{{ project.id }}"/>
                                         <button type="submit" class="btn btn-default btn-sm">
-                                            <span class="glyphicon glyphicon-trash"></span>
+                                            <span class="glyphicon glyphicon-trash"> Usuń</span>
                                         </button>
                                     </form>
 
@@ -53,9 +63,20 @@
                                         {% csrf_token %}
                                         <input type="hidden" name="project_id" value="{{ project.id }}"/>
                                         <button type="submit" class="btn btn-default btn-sm">
-                                            <span class="glyphicon glyphicon-edit"></span>
+                                            <span class="glyphicon glyphicon-edit"> Edytuj</span>
                                         </button>
                                     </form>
+                                    {% if not project.available %}
+                                        <form action="{% url 'tutor_projects:project-vacate' project.id %}"
+                                              method="post"
+                                              style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="project_id" value="{{ project.id }}"/>
+                                            <button type="submit" class="btn btn-default btn-sm">
+                                                <span class="glyphicon glyphicon-tree-deciduous"> Zwolnij projekt</span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                 </div><br>
                                 <hr>
                             {% endfor %}

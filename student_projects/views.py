@@ -117,7 +117,7 @@ def create_project_team(project):
     project_team = ProjectTeam()
     project_team.project = project
     project_team.save()
-    return project
+    return project_team
 
 def set_project_unavailable(project):
     project.available = False

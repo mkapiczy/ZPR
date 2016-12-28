@@ -39,9 +39,6 @@ class ProjectsView(View):
 
 
 def read_projects_from_file(request):
-    file = request.FILES['projects_file']
-    # print(request.FILES['projects_file'].read())
-    #
     file = TextIOWrapper(request.FILES['projects_file'].file, encoding='utf-8')
 
     reader = csv.reader(file, delimiter=',')
@@ -113,3 +110,23 @@ class ProjectDelete(DeleteView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(ProjectDelete, self).dispatch(request, *args, **kwargs)
+
+def vacate_project(request, pk):
+    print('hello')
+    project = get_object_or_404(Project, id=pk)
+    for project_team in project.projectteam_set.all():
+        project_team.project =None
+        project_team.delete()
+
+    clear_project_signed_users_set(project)
+    set_project_available(project)
+    return redirect('tutor_projects:projects')
+
+def set_project_available(project):
+    project.available = True
+    project.save()
+
+def clear_project_signed_users_set(project):
+    for student in project.studentuser_set.all():
+        student.signed_project = None
+        student.save()
