@@ -7,7 +7,7 @@ from main.models import Project, NewProjectTeamRequest, NewProjectTeamMessage, M
 
 from main.permissions import has_student_permissions, has_tutor_permissions
 from student.models import StudentUser, ProjectTeam
-from student.views import get_student_user_from_request
+from student.views import get_student_user_from_request, refresh_inbox_status
 from student_projects.forms import CreateProjectTeamForm, SignedStudent
 
 
@@ -36,6 +36,7 @@ class ProjectsView(View):
                 request.session['signed_project_id'] = student_signed_project.id
             if (student.project_team is not None):
                 request.session['student_team_registered'] = True
+            refresh_inbox_status(request, student)
             return render(request, self.template_name, {'course_projects': course_projects})
         else:
             return redirect('student:index')

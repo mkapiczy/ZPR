@@ -37,11 +37,7 @@ class IndexView(View):
         student = get_student_user_from_request(request)
         student_courses = student.courses.all()
         request.session['courses'] = student_courses
-
-        inbox = get_student_messages(student)
-        request.session['inbox'] = inbox
-        request.session['unread_messages_size'] = len(inbox)
-
+        refresh_inbox_status(request, student)
         return render(request, self.template_name, {'posts': posts})
 
 
@@ -51,3 +47,7 @@ def get_student_user_from_request(request):
     return student
 
 
+def refresh_inbox_status(request, student):
+    inbox = get_student_messages(student)
+    request.session['inbox'] = inbox
+    request.session['unread_messages_size'] = len(inbox)
