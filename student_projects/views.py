@@ -11,7 +11,7 @@ from student.views import get_student_user_from_request
 from student_inbox.methods import refresh_inbox_status
 from student_projects.forms import CreateProjectTeamForm, SignedStudent
 from student_projects.methods import get_student_inbox_or_create_if_none, create_new_project_team_request, \
-    create_project_team
+    create_project_team, createNewProjectTeamMessage
 
 
 class ProjectsView(View):
@@ -37,6 +37,8 @@ class ProjectsView(View):
 
             if (student.project_team is not None):
                 request.session['student_team_registered'] = True
+            else:
+                request.session['student_team_registered'] = False
 
             refresh_inbox_status(request, student)
             return render(request, self.template_name, {'course_projects': course_projects})
@@ -77,21 +79,21 @@ class CreateProjectTeamView(View):
 
             new_team_request = create_new_project_team_request(project_team)
 
-            message = Message(title = 'Grupa projektowa', text='Czy chcesz zaakceptować zaproszenie do krupy projektowej?')
-            message.save()
+
 
             for student in chosen_students:
+                student.signed_project = project
+                student.project_team = project_team
+                student.save()
+
                 new_team_message = NewProjectTeamMessage()
                 new_team_message.request = new_team_request
-                new_team_message.message = message
+                new_team_message.message =  createNewProjectTeamMessage(project_team)
 
                 student_inbox = get_student_inbox_or_create_if_none(student)
 
                 new_team_message.user_inbox = student_inbox
                 new_team_message.save()
-
-                student.signed_project = project
-                student.save()
 
             return redirect('student_projects:projects')
         else:

@@ -7,7 +7,9 @@ from django.views import View
 from main.models import NewProjectTeamMessage
 from main.permissions import has_student_permissions
 from student.methods import get_student_user_from_request
-from student_inbox.methods import get_student_messages, refresh_inbox_status
+from student_inbox.methods import get_student_messages, refresh_inbox_status, acceptSingleTeamMessage, \
+    allMessagesAssignedToThisTeamRequestAreAccepted, acceptProjectTeamAssignedToMessage, \
+    deleteTeamRequestAssignedToMessage, deleteNotAcceptedProjectTeamsAndTheirRequests, markAllMessagesAsRead
 
 
 class InboxView(View):
@@ -23,25 +25,26 @@ class InboxView(View):
     def get(self, request):
         student = get_student_user_from_request(request)
         if student is not None:
-            request.session['isStudentSignedToProject'] = student.project_team is not None
+            request.session[
+                'isStudentSignedToProject'] = student.project_team is not None and student.project_team.accepted
             inbox = get_student_messages(student)
+            markAllMessagesAsRead(inbox)
             refresh_inbox_status(request, student)
             return render(request, self.template_name, {'inbox': inbox})
         else:
             return redirect('student_inbox:index')
 
 
-def accept_project_team(request, pk):
-    message = get_object_or_404(NewProjectTeamMessage, id=pk)
-    message.accepted = True
-    message.save()
-    all_messages_accepted = True
-    for msg in message.request.newprojectteammessage_set.all():
-        if not msg.accepted:
-            all_messages_accepted = False
+def accept_project_team_message(request, pk):
+    message = acceptSingleTeamMessage(pk)
 
-    if all_messages_accepted:
+    if allMessagesAssignedToThisTeamRequestAreAccepted(message):
         print('Request accepted!')
+        project_team = acceptProjectTeamAssignedToMessage(message)
+
+        deleteTeamRequestAssignedToMessage(message.request)
+        deleteNotAcceptedProjectTeamsAndTheirRequests(project_team)
+
     return redirect('student_inbox:index')
 
 
