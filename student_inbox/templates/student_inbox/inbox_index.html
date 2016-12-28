@@ -1,0 +1,30 @@
+<!DOC{% extends 'student/base.html' %}
+{% block title %}Wiadomości{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="thumbnail caption">
+                            Twoje wiadomości
+                        </div>
+                        {% if inbox %}
+                            <div class="col-sm-12">
+                                <div class="caption">
+                                    {% for msg in inbox %}
+                                        {{ msg.message.title }} <br>
+                                        {{ msg.message.text }}<br><br>
+                                        <hr>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

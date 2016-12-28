@@ -54,7 +54,7 @@
             <ul class="nav navbar-nav nav navbar-right">
                 {% if request.session.inbox %}
                     <li class="">
-                        <a href="{% url 'student:album-add' %}">
+                        <a href="{% url 'student_inbox:index' %}">
                             <span class="glyphicon glyphicon-inbox" aria-hidden="true"></span>&nbsp;
                             ({{ request.session.unread_messages_size }})
                         </a>
