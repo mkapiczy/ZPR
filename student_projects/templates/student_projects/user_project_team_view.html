@@ -1,0 +1,35 @@
+<!DOC{% extends 'student/base.html' %}
+{% block title %}Lista projektów{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        {% if projectTeam and project %}
+                            <div class="thumbnail caption">
+                                Twój zespół projektowy
+                            </div>
+
+                            Nazwa projektu: {{ project.name }} <br><br>
+                            Opis projektu: {{ project.description }}<br><br>
+
+                            <hr>
+
+                            Skład zespołu:
+                            <ul class="list-group">
+                                {% for student in projectTeam.studentuser_set.all %}
+                                    <li class="list-group-item">{{ student.profile.first_name }} {{ student.profile.last_name }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            Nie jesteś zapisany do żadnego zespołu projektowego
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from main.models import Project, NewProjectTeamMessage, Message
+from main.models import Project, NewProjectTeamMessage, Message, Course
 from main.permissions import has_student_permissions
 from student.models import StudentUser
 from student.views import get_student_user_from_request
@@ -46,6 +46,33 @@ class ProjectsView(View):
             return redirect('student:index')
 
 
+class UserProjectTeamView(View):
+    template_name = 'student_projects/user_project_team_view.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if has_student_permissions(request.user):
+            return super(UserProjectTeamView, self).dispatch(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden('User has no access rights for viewing this page')
+
+    def get(self, request):
+        student = get_student_user_from_request(request)
+        refresh_inbox_status(request, student)
+
+        selected_course_id = request.session.get('selected_course_id')
+        if (selected_course_id is not None):
+            # course = Course.objects.get(Course, id=selected_course_id)
+            studentProjectTeam = student.project_team
+            if studentProjectTeam is not None:
+                return render(request, self.template_name,
+                              {'projectTeam': studentProjectTeam, 'project': studentProjectTeam.project})
+            else:
+                return render(request, self.template_name)
+        else:
+            return redirect('student:index')
+
+
 def sing_to_project(request, pk):
     project_id = request.POST['project_id']
     project = get_object_or_404(Project, id=project_id)
@@ -79,8 +106,6 @@ class CreateProjectTeamView(View):
 
             new_team_request = create_new_project_team_request(project_team)
 
-
-
             for student in chosen_students:
                 student.signed_project = project
                 student.project_team = project_team
@@ -88,7 +113,7 @@ class CreateProjectTeamView(View):
 
                 new_team_message = NewProjectTeamMessage()
                 new_team_message.request = new_team_request
-                new_team_message.message =  createNewProjectTeamMessage(project_team)
+                new_team_message.message = createNewProjectTeamMessage(project_team)
 
                 student_inbox = get_student_inbox_or_create_if_none(student)
 
@@ -127,4 +152,3 @@ class CreateProjectTeamView(View):
         for student_id in students:
             chosen_students.append(StudentUser.objects.get(id=student_id))
         return chosen_students
-
