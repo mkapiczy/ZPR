@@ -101,8 +101,10 @@ def vacate_project(request, pk):
     project = get_object_or_404(Project, id=pk)
     for project_team in project.projectteam_set.all():
         for student in project_team.studentuser_set.all():
-            student.project_team = None
-            student.save()
+            for student_team in student.project_teams:
+                if student_team == project_team:
+                    student.project_teams.remove(student_team)
+                    student.save()
         project_team.project =None
         project_team.delete()
 
