@@ -1,6 +1,7 @@
 from django.db import models
 
-from main.models import UserProfile, Course
+from main.models import UserProfile, Course, Project
+from student.models import ProjectTeam
 
 
 class TutorUser(models.Model):
@@ -16,6 +17,19 @@ class TutorUser(models.Model):
                 return tutorCourse
         tutorCourse = TutorCourse(tutor=self, courseId=selectedCourseId, allowedTeamsNumber=10)
         return tutorCourse
+
+    def getTutorAllowedTeamsNumberByCourseId(self,courseId):
+        return self.getTutorCourseByCourseId(courseId).allowedTeamsNumber
+
+    def getAllTeamsAssignedToTutorForCourse(self, courseId):
+        tutorTeams = []
+        allTutorProjects = Project.objects.filter(tutor=self, course=courseId)
+        for project in allTutorProjects:
+            try:
+                tutorTeams.append(ProjectTeam.objects.get(project=project, accepted=True))
+            except ProjectTeam.DoesNotExist:
+                pass
+        return tutorTeams
 
 
 class TutorCourse(models.Model):

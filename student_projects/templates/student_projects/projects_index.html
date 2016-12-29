@@ -2,11 +2,15 @@
 {% block title %}Lista projektów{% endblock %}
 
 {% block body %}
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12 col-md-12">
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        {% if request.session.TutorHasToManyTeamsError %}
+                            <div class="alert alert-danger">Prowadzący ma już zbyt wiele zespołów! Zapisz się do innego prowadzącego.</div>
+                        {% endif %}
                         <div class="thumbnail caption">
                             Lista projektów
                         </div>
@@ -21,6 +25,8 @@
                                     Status projektu: {% if project.available %}
                                     <div class="label label-success">Dostępny</div>{% else %}
                                     <div class="label label-danger">Zajęty</div>{% endif %}
+                                    <br>
+                                    Prowadzący: {{ project.tutor.profile.first_name }} {{ project.tutor.profile.last_name }}
                                     <br><br>
                                     {% if project.studentuser_set.all %}
                                         <span class="label label-info">Zapisani studenci:</span> <br>

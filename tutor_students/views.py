@@ -11,6 +11,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 
+from main.methods import delayErrorAlertFade
 from main.models import MyUser, UserProfile
 from main.permissions import has_tutor_permissions
 from main.views import uniqueContraintValidationRedirect
@@ -32,11 +33,7 @@ class StudentsView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
-        if (request.session.get('delayClearParam') is not None):
-            request.session['delayClearParam'] = None
-        else:
-            request.session['notAddedStudents'] = None
-
+        delayErrorAlertFade(request,'notAddedStudents')
         selected_course_id = request.session.get('selected_course_id')
         if (selected_course_id is not None):
             course_students = StudentUser.objects.filter(courses__in=[selected_course_id])

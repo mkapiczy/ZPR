@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 
+from main.methods import delayErrorAlertFade
 from main.models import Project, NewProjectTeamMessage
 from main.permissions import has_student_permissions
 from student.views import getStudentUserFromRequest
@@ -25,6 +26,7 @@ class ProjectsView(View):
 
     def get(self, request):
         selectedCourseId = request.session.get('selected_course_id')
+        delayErrorAlertFade(request, 'TutorHasToManyTeamsError')
         if (selectedCourseId is not None):
             allCourseProjects = Project.objects.filter(course=selectedCourseId)
 
@@ -100,8 +102,15 @@ class CreateProjectTeamView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request, pk):
-        form = self.populate_form(pk)
-        return render(request, self.template_name, {'nbar': 'projects','form': form})
+        project = get_object_or_404(Project, id=pk)
+        if tutorAllowedTeamsNumberNotExceeded(project):
+            form = self.populate_form(project)
+            return render(request, self.template_name, {'nbar': 'projects', 'form': form})
+        else:
+            request.session['delayClearParam'] = True
+            request.session[
+                'TutorHasToManyTeamsError'] = 'Prowadzący ma już zbyt wiele zespołów! Zapisz się do innego prowadzącego.'
+            return redirect('student_projects:projects')
 
     def post(self, request, pk):
         selectedCourseId = request.session.get('selected_course_id')
@@ -132,10 +141,9 @@ class CreateProjectTeamView(View):
                 'Wybierz liczbę studentów między: '
                 + project.minimum_students_number.__str__() + ' - '
                 + project.allowed_students_number.__str__() + ' !']
-            return render(request, self.template_name, {'nbar': 'projects','form': form, 'custom_errors': errors})
+            return render(request, self.template_name, {'nbar': 'projects', 'form': form, 'custom_errors': errors})
 
-    def populate_form(self, pk):
-        project = get_object_or_404(Project, id=pk)
+    def populate_form(self, project):
         signedStudents = project.studentuser_set.all()
         choices = []
         for student in signedStudents:
@@ -143,3 +151,16 @@ class CreateProjectTeamView(View):
         form = CreateProjectTeamForm()
         form.signed_students = choices
         return form
+
+
+def tutorAllowedTeamsNumberNotExceeded(project):
+    tutor = project.tutor
+    tutorAllowedTeamsNumber = tutor.getTutorAllowedTeamsNumberByCourseId(project.course_id)
+    tutorTeams = tutor.getAllTeamsAssignedToTutorForCourse(project.course_id)
+    print('TutorTeams: ' + len(tutorTeams).__str__())
+    print('Allowed: ' + tutorAllowedTeamsNumber.__str__())
+    if len(tutorTeams) < tutorAllowedTeamsNumber:
+        return True
+    else:
+        return False
+
