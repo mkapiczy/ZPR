@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'tutor_posts.apps.TutorPostsConfig',
     'tutor_projects.apps.TutorProjectsConfig',
     'tutor_students.apps.TutorStudentsConfig',
+    'tutor_courses.apps.TutorCoursesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

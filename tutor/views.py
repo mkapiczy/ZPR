@@ -6,7 +6,7 @@ from django.views import View
 
 from main.permissions import has_tutor_permissions
 from main_posts.models import Post
-from tutor.methods import get_tutor_user_from_request
+from tutor.methods import getTutorUserFromRequest
 
 
 class IndexView(View):
@@ -30,7 +30,7 @@ class IndexView(View):
         else:
             posts = Post.objects.all()
 
-        tutor = get_tutor_user_from_request(request)
+        tutor = getTutorUserFromRequest(request)
         tutorCourses = tutor.courses.all()
         request.session['courses'] = tutorCourses
         return render(request, self.template_name, {'posts': posts})

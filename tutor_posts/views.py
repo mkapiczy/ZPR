@@ -7,7 +7,7 @@ from django.views.generic import DeleteView
 
 from main.permissions import has_tutor_permissions
 from main_posts.models import Post
-from tutor.methods import get_tutor_user_from_request
+from tutor.methods import getTutorUserFromRequest
 from tutor_posts.forms import CreatePostForm
 
 
@@ -19,7 +19,7 @@ class PostCreate(CreateView):
 
 
     def form_valid(self, form):
-        tutor = get_tutor_user_from_request(self.request)
+        tutor = getTutorUserFromRequest(self.request)
         form.instance.tutor = tutor
         return super(PostCreate, self).form_valid(form)
 

@@ -54,6 +54,12 @@
                         Studenci
                     </a>
                 </li>
+                <li class="{% if nbar == 'courses' %}active{% endif %}">
+                    <a href="{% url 'tutor_courses:index' %}">
+                        <span class="glyphicon glyphicon-book" aria-hidden="true"></span>&nbsp;
+                        Przedmioty
+                    </a>
+                </li>
             </ul>
 
             <ul class="nav navbar-nav nav navbar-right">

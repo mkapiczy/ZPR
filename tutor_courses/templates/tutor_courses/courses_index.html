@@ -1,0 +1,50 @@
+<!DOC{% extends 'tutor/base.html' %}
+{% block title %}Lista przedmiotów{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <a href="{% url 'tutor_courses:course-add' %}">
+                    <button type="button" class="btn btn-success">
+                        <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj nowy przedmiot
+                    </button>
+                </a> <br><br>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="thumbnail caption">
+                            Lista przedmiotów
+                        </div>
+                        <hr>
+                        <br>
+                        {% if courses %}
+                            {% for course in courses %}
+                                <div class="caption">
+                                    Nazwa przedmiotu: {{ course.name }} <br><br>
+                                    Nazwa skrócona przedmiotu: {{ course.short_name }}<br><br>
+                                    {% if course.tutoruser_set.all %}
+                                        <span class="label label-info">Przypisani prowadzący:</span> <br>
+                                        <ul class="list-group">
+                                            {% for tutor in course.tutoruser_set.all %}
+                                                <li class="list-group-item">{{ tutor.profile.first_name }} {{ tutor.profile.last_name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                    {% if course.assigned %}
+                                        Wypisz się
+                                    {% else %}
+                                        Przypisz do siebie
+                                    {% endif %}
+                                </div>
+                                <br>
+                                <hr>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
