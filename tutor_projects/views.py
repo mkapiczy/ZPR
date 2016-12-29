@@ -21,7 +21,6 @@ class ProjectsView(View):
     template_name = 'tutor_projects/projects_index.html'
     index_template = 'tutor/index.html'
 
-
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         if has_tutor_permissions(request.user):
@@ -30,10 +29,10 @@ class ProjectsView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
-        selected_course_id = request.session.get('selected_course_id')
-        if (selected_course_id is not None):
-            course_projects= Project.objects.filter(course=selected_course_id)
-            return render(request, self.template_name,{'course_projects':course_projects})
+        selectedCourseId = request.session.get('selected_course_id')
+        if (selectedCourseId is not None):
+            allCourseProjects = Project.objects.filter(course=selectedCourseId)
+            return render(request, self.template_name, {'course_projects': allCourseProjects})
         else:
             return redirect('tutor:index')
 
@@ -44,7 +43,7 @@ def read_projects_from_file(request):
     reader = csv.reader(file, delimiter=',')
     descriptions = []
     for row in reader:
-        if(row):
+        if (row):
             project = Project()
             project.name = 'Projekt'
             project.description = row
@@ -71,12 +70,13 @@ class ProjectCreate(View):
             project = form.save(commit=False)
 
             try:
-               saveProject(project, request)
+                saveProject(project, request)
             except IntegrityError as e:
                 return render(request, self.template_name,
                               {'form': form, 'error_message': 'Taki projekt już istnieje!'})
 
             return redirect('tutor_projects:projects')
+
 
 class ProjectUpdate(UpdateView):
     template_name = 'tutor_projects/project_form.html'
@@ -88,6 +88,7 @@ class ProjectUpdate(UpdateView):
     def dispatch(self, request, *args, **kwargs):
         return super(ProjectUpdate, self).dispatch(request, *args, **kwargs)
 
+
 class ProjectDelete(DeleteView):
     model = Project
     success_url = reverse_lazy('tutor_projects:projects')
@@ -96,21 +97,18 @@ class ProjectDelete(DeleteView):
     def dispatch(self, request, *args, **kwargs):
         return super(ProjectDelete, self).dispatch(request, *args, **kwargs)
 
+
 def vacate_project(request, pk):
     print('hello')
     project = get_object_or_404(Project, id=pk)
-    for project_team in project.projectteam_set.all():
-        for student in project_team.studentuser_set.all():
-            for student_team in student.project_teams:
-                if student_team == project_team:
-                    student.project_teams.remove(student_team)
+    for projectTeam in project.projectteam_set.all():
+        for student in projectTeam.studentuser_set.all():
+            for studentProjectTeam in student.projectTeams.all():
+                if studentProjectTeam == projectTeam:
+                    student.removeProjectTeamForCourse(projectTeam.course.id)
                     student.save()
-        project_team.project =None
-        project_team.delete()
+        projectTeam.project = None
+        projectTeam.delete()
 
     set_project_available(project)
     return redirect('tutor_projects:projects')
-
-
-
-
