@@ -40,7 +40,7 @@ class StudentsView(View):
         selected_course_id = request.session.get('selected_course_id')
         if (selected_course_id is not None):
             course_students = StudentUser.objects.filter(courses__in=[selected_course_id])
-            return render(request, self.template_name, {'course_students': course_students})
+            return render(request, self.template_name, {'nbar': 'students', 'course_students': course_students})
         else:
             return redirect('tutor:index')
 
@@ -51,7 +51,7 @@ class CreateStudent(View):
 
     def get(self, request):
         form = StudentForm()
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'nbar': 'students', 'form': form})
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -91,7 +91,7 @@ class UpdateStudent(View):
                  'last_name': student.profile.last_name})
             form.fields['first_name'].widget.attrs['readonly'] = True
             form.fields['last_name'].widget.attrs['readonly'] = True
-            return render(request, self.template_name, {'form': form})
+            return render(request, self.template_name, {'nbar': 'students', 'form': form})
         else:
             return redirect('tutor_students:index')
 
@@ -133,10 +133,10 @@ class DeleteStudent(View):
                 user.delete()
             except User.DoesNotExist:
                 messages.error(request, "User does not exist")
-                return render(request, 'tutor_students/students_index.html')
+                return render(request, 'tutor_students/students_index.html', {'nbar': 'students'})
 
             except Exception as e:
-                return render(request, 'tutor_students/students_index.html', {'errors': e})
+                return render(request, 'tutor_students/students_index.html', {'nbar': 'students', 'errors': e})
 
         return redirect('tutor_students:index')
 
@@ -160,11 +160,10 @@ def read_students_from_file(request):
                         profile = createNewUserProfile(myUser)
                         createNewStudentUser(profile, album_number, group, request)
                     else:
-                        if(not addStudentToSelectedCourse(album_number,request)):
+                        if (not addStudentToSelectedCourse(album_number, request)):
                             notAddedStudents.append(first_name + ' ' + last_name)
                 except IntegrityError as e:
                     notAddedStudents.append([first_name + ' ' + last_name])
                     pass
-    setNotAddedStudentsRequestParam(notAddedStudents,request)
+    setNotAddedStudentsRequestParam(notAddedStudents, request)
     return redirect('tutor_students:index')
-

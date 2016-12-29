@@ -32,7 +32,7 @@ class ProjectsView(View):
         selectedCourseId = request.session.get('selected_course_id')
         if (selectedCourseId is not None):
             allCourseProjects = Project.objects.filter(course=selectedCourseId)
-            return render(request, self.template_name, {'course_projects': allCourseProjects})
+            return render(request, self.template_name, {'nbar': 'projects', 'course_projects': allCourseProjects})
         else:
             return redirect('tutor:index')
 
@@ -61,7 +61,7 @@ class ProjectCreate(View):
 
     def get(self, request):
         form = self.form_class(None)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'nbar': 'projects', 'form': form})
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -73,7 +73,7 @@ class ProjectCreate(View):
                 saveProject(project, request)
             except IntegrityError as e:
                 return render(request, self.template_name,
-                              {'form': form, 'error_message': 'Taki projekt już istnieje!'})
+                              {'nbar': 'projects', 'form': form, 'error_message': 'Taki projekt już istnieje!'})
 
             return redirect('tutor_projects:projects')
 

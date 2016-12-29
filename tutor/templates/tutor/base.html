@@ -42,13 +42,13 @@
                         {% endif %}
                     </ul>
                 </li>
-                <li class="active">
+                <li class="{% if nbar == 'projects' %}active{% endif %}">
                     <a href="{% url 'tutor_projects:projects' %}">
                         <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>&nbsp;
                         Projekty
                     </a>
                 </li>
-                <li class="">
+                <li class="{% if nbar == 'students' %}active{% endif %}">
                     <a href="{% url 'tutor_students:index' %}">
                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;
                         Studenci
