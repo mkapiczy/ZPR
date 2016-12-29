@@ -6,8 +6,8 @@ from django.views import View
 
 from main.permissions import has_student_permissions
 from main_posts.models import Post
-from student.methods import get_student_user_from_request
-from student_inbox.methods import refresh_inbox_status
+from student.methods import getStudentUserFromRequest
+from student_inbox.methods import refreshInboxStatus
 
 
 class IndexView(View):
@@ -23,18 +23,18 @@ class IndexView(View):
 
     def get(self, request):
         posts = []
-        if 'selected_course_id' in request.session:
-            selected_course_id = request.session.get('selected_course_id')
+        selectedCourseId = request.session.get('selected_course_id')
+        if selectedCourseId is not None:
             try:
-                posts = Post.objects.filter(course=selected_course_id)
+                posts = Post.objects.filter(course=selectedCourseId)
             except Post.DoesNotExist:
                 pass
         else:
             posts = Post.objects.all()
 
-        student = get_student_user_from_request(request)
-        student_courses = student.courses.all()
-        request.session['courses'] = student_courses
-        refresh_inbox_status(request, student)
+        student = getStudentUserFromRequest(request)
+        studentCourses = student.courses.all()
+        request.session['courses'] = studentCourses
+        refreshInboxStatus(request, student)
         return render(request, self.template_name, {'posts': posts})
 

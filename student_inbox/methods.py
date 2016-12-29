@@ -4,15 +4,15 @@ from main.models import NewProjectTeamMessage
 from student.models import ProjectTeam
 
 
-def get_student_messages(student):
+def getStudentMessages(student):
     messages = []
     if student.profile.inbox and student.profile.inbox.newprojectteammessage_set:
         for msg in student.profile.inbox.newprojectteammessage_set.all():
             messages.append(msg)
     return messages
 
-def refresh_inbox_status(request, student):
-    inbox = get_student_messages(student)
+def refreshInboxStatus(request, student):
+    inbox = getStudentMessages(student)
     unread_messages_amount = 0
     for message in inbox:
         if not message.read:

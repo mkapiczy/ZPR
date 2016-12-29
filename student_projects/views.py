@@ -4,14 +4,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from main.models import Project, NewProjectTeamMessage, Message, Course
+from main.models import Project, NewProjectTeamMessage
 from main.permissions import has_student_permissions
-from student.models import StudentUser
-from student.views import get_student_user_from_request
-from student_inbox.methods import refresh_inbox_status
+from student.views import getStudentUserFromRequest
+from student_inbox.methods import refreshInboxStatus
 from student_projects.forms import CreateProjectTeamForm, SignedStudent
-from student_projects.methods import getStudentInboxOrCreateIfNone, create_new_project_team_request, \
-    createProjectTeam, createNewProjectTeamMessage
+from student_projects.methods import getStudentInboxOrCreateIfNone, createNewProjectTeamRequest, \
+    createProjectTeam, createNewProjectTeamMessage, getChosenStudentsFromRequest, chosenStudentsAreValid
 
 
 class ProjectsView(View):
@@ -29,7 +28,7 @@ class ProjectsView(View):
         if (selectedCourseId is not None):
             allCourseProjects = Project.objects.filter(course=selectedCourseId)
 
-            student = get_student_user_from_request(request)
+            student = getStudentUserFromRequest(request)
             studentSignedProject = student.getSignedProjectForCourse(selectedCourseId)
             studentProjectTeam = student.getProjectTeamForCourse(selectedCourseId)
 
@@ -41,7 +40,7 @@ class ProjectsView(View):
             else:
                 request.session['student_team_registered'] = False
 
-            refresh_inbox_status(request, student)
+            refreshInboxStatus(request, student)
             return render(request, self.template_name, {'course_projects': allCourseProjects})
         else:
             return redirect('student:index')
@@ -58,8 +57,8 @@ class UserProjectTeamView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
-        student = get_student_user_from_request(request)
-        refresh_inbox_status(request, student)
+        student = getStudentUserFromRequest(request)
+        refreshInboxStatus(request, student)
 
         selectedCourseId = request.session.get('selected_course_id')
         if (selectedCourseId is not None):
@@ -78,7 +77,7 @@ def sing_to_project(request, pk):
 
     project_id = request.POST['project_id']
     project = get_object_or_404(Project, id=project_id)
-    student = get_student_user_from_request(request)
+    student = getStudentUserFromRequest(request)
     studentSignedProjectForCourse = student.getSignedProjectForCourse(selectedCourseId)
     if studentSignedProjectForCourse is not None:
         student.signedProjects.remove(studentSignedProjectForCourse)
@@ -107,14 +106,14 @@ class CreateProjectTeamView(View):
         selectedCourseId = request.session.get('selected_course_id')
 
         project = get_object_or_404(Project, id=pk)
-        chosen_students = self.get_chosen_students_from_request(request)
+        chosenStudents = getChosenStudentsFromRequest(request)
 
-        if self.chosen_students_are_valid(chosen_students, project):
+        if chosenStudentsAreValid(chosenStudents, project):
             projectTeam = createProjectTeam(project)
 
-            projectTeamRequest = create_new_project_team_request(projectTeam)
+            projectTeamRequest = createNewProjectTeamRequest(projectTeam)
 
-            for student in chosen_students:
+            for student in chosenStudents:
                 student.setSignedProjectForCourse(project, selectedCourseId)
                 student.setProjectTeamForCourse(projectTeam, selectedCourseId)
                 student.save()
@@ -136,24 +135,10 @@ class CreateProjectTeamView(View):
 
     def populate_form(self, pk):
         project = get_object_or_404(Project, id=pk)
-        signed_students = project.studentuser_set.all()
+        signedStudents = project.studentuser_set.all()
         choices = []
-        for student in signed_students:
+        for student in signedStudents:
             choices.append(SignedStudent(student.id, student.profile.first_name + ' ' + student.profile.last_name))
         form = CreateProjectTeamForm()
         form.signed_students = choices
         return form
-
-    def chosen_students_are_valid(self, chosen_students, project):
-        if (len(chosen_students) >= project.minimum_students_number
-            and len(chosen_students) <= project.allowed_students_number):
-            return True
-        else:
-            return False
-
-    def get_chosen_students_from_request(self, request):
-        students = request.POST.getlist('students')
-        chosen_students = []
-        for student_id in students:
-            chosen_students.append(StudentUser.objects.get(id=student_id))
-        return chosen_students

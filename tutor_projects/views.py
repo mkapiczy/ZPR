@@ -14,7 +14,7 @@ from django.views.generic import UpdateView
 from main.models import Project
 from main.permissions import has_tutor_permissions
 from tutor_projects.forms import ProjectForm
-from tutor_projects.methods import set_project_available, saveProject
+from tutor_projects.methods import saveProject
 
 
 class ProjectsView(View):
@@ -110,5 +110,5 @@ def vacate_project(request, pk):
         projectTeam.project = None
         projectTeam.delete()
 
-    set_project_available(project)
+    project.setProjectAvailable()
     return redirect('tutor_projects:projects')

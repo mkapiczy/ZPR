@@ -16,7 +16,3 @@ def saveProject(project, request):
 
     project.save()
 
-
-def set_project_available(project):
-    project.available = True
-    project.save()

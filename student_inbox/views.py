@@ -6,8 +6,8 @@ from django.views import View
 
 from main.models import NewProjectTeamMessage
 from main.permissions import has_student_permissions
-from student.methods import get_student_user_from_request
-from student_inbox.methods import get_student_messages, refresh_inbox_status, acceptSingleTeamMessage, \
+from student.methods import getStudentUserFromRequest
+from student_inbox.methods import getStudentMessages, refreshInboxStatus, acceptSingleTeamMessage, \
     allMessagesAssignedToThisTeamRequestAreAccepted, acceptProjectTeamAssignedToMessage, \
     deleteTeamRequestAssignedToMessage, deleteNotAcceptedProjectTeamsAndTheirRequests, markAllMessagesAsRead
 
@@ -24,12 +24,12 @@ class InboxView(View):
 
     def get(self, request):
         selectedCourseId = request.session.get('selected_course_id')
-        student = get_student_user_from_request(request)
+        student = getStudentUserFromRequest(request)
         if student is not None:
             request.session['isStudentSignedToProject'] = student.isStudentSignedToCourseProjectTeam(selectedCourseId)
-            inbox = get_student_messages(student)
+            inbox = getStudentMessages(student)
             markAllMessagesAsRead(inbox)
-            refresh_inbox_status(request, student)
+            refreshInboxStatus(request, student)
             return render(request, self.template_name, {'inbox': inbox})
         else:
             return redirect('student_inbox:index')
@@ -40,10 +40,10 @@ def accept_project_team_message(request, pk):
 
     if allMessagesAssignedToThisTeamRequestAreAccepted(message):
         print('Request accepted!')
-        project_team = acceptProjectTeamAssignedToMessage(message)
+        projectTeam = acceptProjectTeamAssignedToMessage(message)
 
         deleteTeamRequestAssignedToMessage(message.request)
-        deleteNotAcceptedProjectTeamsAndTheirRequests(project_team)
+        deleteNotAcceptedProjectTeamsAndTheirRequests(projectTeam)
 
     return redirect('student_inbox:index')
 

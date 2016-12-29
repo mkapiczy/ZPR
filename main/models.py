@@ -72,3 +72,11 @@ class Project(models.Model):
     available = models.BooleanField(default=True)
     course = models.ForeignKey(Course)
     tutor = models.ForeignKey('tutor.TutorUser')
+
+    def setProjectUnavailable(self):
+        self.available = False
+        self.save()
+
+    def setProjectAvailable(self):
+        self.available = True
+        self.save()

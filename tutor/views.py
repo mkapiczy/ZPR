@@ -21,18 +21,16 @@ class IndexView(View):
 
     def get(self, request):
         posts = []
-        if 'selected_course_id' in request.session:
-            selected_course_id = request.session.get('selected_course_id')
+        selectedCourseId = request.session.get('selected_course_id')
+        if selectedCourseId is not None:
             try:
-                posts = Post.objects.filter(course=selected_course_id)
+                posts = Post.objects.filter(course=selectedCourseId)
             except Post.DoesNotExist:
                 pass
         else:
             posts = Post.objects.all()
 
         tutor = get_tutor_user_from_request(request)
-        tutor_courses = tutor.courses.all()
-        request.session['courses'] = tutor_courses
+        tutorCourses = tutor.courses.all()
+        request.session['courses'] = tutorCourses
         return render(request, self.template_name, {'posts': posts})
-
-

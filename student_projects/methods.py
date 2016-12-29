@@ -1,5 +1,5 @@
 from main.models import NewProjectTeamRequest, UserInbox, Message, Course
-from student.models import ProjectTeam
+from student.models import ProjectTeam, StudentUser
 
 
 def createProjectTeam(project):
@@ -10,7 +10,7 @@ def createProjectTeam(project):
     return projectTeam
 
 
-def create_new_project_team_request(project_team):
+def createNewProjectTeamRequest(project_team):
     new_team_request = NewProjectTeamRequest()
     new_team_request.project_team = project_team
     new_team_request.save()
@@ -24,11 +24,6 @@ def getStudentInboxOrCreateIfNone(student):
         student.profile.inbox = inbox
         student.save()
     return student.profile.inbox
-
-
-def set_project_unavailable(project):
-    project.available = False
-    project.save()
 
 
 def clear_project_signed_users_set(project):
@@ -48,3 +43,19 @@ def createNewProjectTeamMessage(project_team):
     message = Message(title=title, text=text)
     message.save()
     return message
+
+
+def chosenStudentsAreValid(chosen_students, project):
+    if (len(chosen_students) >= project.minimum_students_number
+        and len(chosen_students) <= project.allowed_students_number):
+        return True
+    else:
+        return False
+
+
+def getChosenStudentsFromRequest(request):
+    students = request.POST.getlist('students')
+    chosen_students = []
+    for student_id in students:
+        chosen_students.append(StudentUser.objects.get(id=student_id))
+    return chosen_students

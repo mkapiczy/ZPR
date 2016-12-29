@@ -5,11 +5,9 @@ from django.utils.decorators import method_decorator
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
 
-from main.models import UserProfile
 from main.permissions import has_tutor_permissions
 from main_posts.models import Post
 from tutor.methods import get_tutor_user_from_request
-from tutor.models import TutorUser
 from tutor_posts.forms import CreatePostForm
 
 
