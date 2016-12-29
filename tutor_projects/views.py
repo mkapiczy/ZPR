@@ -13,6 +13,7 @@ from django.views.generic import UpdateView
 
 from main.models import Project
 from main.permissions import has_tutor_permissions
+from tutor.methods import getTutorUserFromRequest
 from tutor_projects.forms import ProjectForm
 from tutor_projects.methods import saveProject
 
@@ -31,8 +32,12 @@ class ProjectsView(View):
     def get(self, request):
         selectedCourseId = request.session.get('selected_course_id')
         if (selectedCourseId is not None):
+            tutor = getTutorUserFromRequest(request)
+            tutorCourse = tutor.getTutorCourseByCourseId(selectedCourseId)
+
             allCourseProjects = Project.objects.filter(course=selectedCourseId)
-            return render(request, self.template_name, {'nbar': 'projects', 'course_projects': allCourseProjects})
+            return render(request, self.template_name, {'nbar': 'projects', 'course_projects': allCourseProjects,
+                                                        'tutorAllowedTeamsNumber': tutorCourse.allowedTeamsNumber})
         else:
             return redirect('tutor:index')
 
@@ -96,6 +101,24 @@ class ProjectDelete(DeleteView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(ProjectDelete, self).dispatch(request, *args, **kwargs)
+
+
+def plusTutorAllowedTeamsNumber(request):
+    tutorAllowedTeamsNumber = request.POST['tutorAllowedTeamsNumber']
+    tutor = getTutorUserFromRequest(request)
+    tutorCourse = tutor.getTutorCourseByCourseId(request.session.get('selected_course_id'))
+    tutorCourse.allowedTeamsNumber = int(tutorAllowedTeamsNumber) + 1
+    tutorCourse.save()
+    return redirect('tutor_projects:projects')
+
+
+def minusTutorAllowedTeamsNumber(request):
+    tutorAllowedTeamsNumber = request.POST['tutorAllowedTeamsNumber']
+    tutor = getTutorUserFromRequest(request)
+    tutorCourse = tutor.getTutorCourseByCourseId(request.session.get('selected_course_id'))
+    tutorCourse.allowedTeamsNumber = int(tutorAllowedTeamsNumber) - 1
+    tutorCourse.save()
+    return redirect('tutor_projects:projects')
 
 
 def vacate_project(request, pk):

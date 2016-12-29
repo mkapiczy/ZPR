@@ -31,6 +31,6 @@ class IndexView(View):
             posts = Post.objects.all()
 
         tutor = getTutorUserFromRequest(request)
-        tutorCourses = tutor.courses.all()
+        tutorCourses= tutor.courses.all()
         request.session['courses'] = tutorCourses
         return render(request, self.template_name, {'posts': posts})

@@ -5,23 +5,57 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12 col-md-12">
-                <form class="form-horizontal" action="{% url 'tutor_projects:read_projects_from_file' %}"
-                      method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="file" name="projects_file"/>
-                    <br>
-                    <div class="form-group">
-                        <div class="col-sm-10">
-                            <button type="submit" class="btn btn-success">Wczytaj projekty z pliku</button>
+                <div class="row">
+                    <div class="pull-right" style="width: 10%">
+                        <div class="thumbnail caption">
+                            Maksymalna liczba zespołów<br>
+                            <form action="{% url 'tutor_projects:project-teams-minus' %}"
+                                  method="post"
+                                  style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="tutorAllowedTeamsNumber" class="form-control input-number"
+                                       value="{{ tutorAllowedTeamsNumber }}" min="0">
+                                <button class="btn btn-default btn-number" data-type="minus"
+                                        data-field="tutorAllowedTeamsNumber">
+                                    <span class="glyphicon glyphicon-minus"></span>
+                                </button>
+                            </form>
+                            <input type="text" name="tutorAllowedTeamsNumber" class="form-control input-number"
+                                   value="{{ tutorAllowedTeamsNumber }}" min="0">
+                            <form action="{% url 'tutor_projects:project-teams-plus' %}"
+                                  method="post"
+                                  style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="tutorAllowedTeamsNumber" class="form-control input-number"
+                                       value="{{ tutorAllowedTeamsNumber }}" min="0">
+                                <button class="btn btn-default btn-number" data-type="plus"
+                                        data-field="tutorAllowedTeamsNumber">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                            </form>
                         </div>
                     </div>
-                </form>
+                    <div class="pull-left">
+                        <form class="form-horizontal" action="{% url 'tutor_projects:read_projects_from_file' %}"
+                              method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="file" name="projects_file"/>
+                            <br>
+                            <div class="form-group">
+                                <div class="col-sm-10">
+                                    <button type="submit" class="btn btn-success">Wczytaj projekty z pliku</button>
+                                </div>
+                            </div>
+                        </form>
 
-                <a href="{% url 'tutor_projects:project-add' %}">
-                    <button type="button" class="btn btn-success">
-                        <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj nowy projekt
-                    </button>
-                </a> <br><br>
+                        <a href="{% url 'tutor_projects:project-add' %}">
+                            <button type="button" class="btn btn-success">
+                                <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj nowy projekt
+                            </button>
+                        </a> <br><br>
+                    </div>
+                </div>
+
 
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -62,7 +96,8 @@
                                         </form>
 
                                         <!-- Edit Project -->
-                                        <form action="{% url 'tutor_projects:project-update' project.id %}" method="get"
+                                        <form action="{% url 'tutor_projects:project-update' project.id %}"
+                                              method="get"
                                               style="display: inline;">
                                             {% csrf_token %}
                                             <input type="hidden" name="project_id" value="{{ project.id }}"/>
