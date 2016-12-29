@@ -1,12 +1,13 @@
-from main.models import NewProjectTeamRequest, UserInbox, Message
+from main.models import NewProjectTeamRequest, UserInbox, Message, Course
 from student.models import ProjectTeam
 
 
-def create_project_team(project):
-    project_team = ProjectTeam()
-    project_team.project = project
-    project_team.save()
-    return project_team
+def createProjectTeam(project):
+    projectTeam = ProjectTeam()
+    projectTeam.project = project
+    projectTeam.course = project.course
+    projectTeam.save()
+    return projectTeam
 
 
 def create_new_project_team_request(project_team):
@@ -15,13 +16,15 @@ def create_new_project_team_request(project_team):
     new_team_request.save()
     return new_team_request
 
-def get_student_inbox_or_create_if_none(student):
+
+def getStudentInboxOrCreateIfNone(student):
     if student.profile.inbox is None:
         inbox = UserInbox(user_profile=student.profile)
         inbox.save()
         student.profile.inbox = inbox
         student.save()
     return student.profile.inbox
+
 
 def set_project_unavailable(project):
     project.available = False
@@ -33,9 +36,10 @@ def clear_project_signed_users_set(project):
         student.signed_project = None
         student.save()
 
+
 def createNewProjectTeamMessage(project_team):
     title = 'Zaproszenie do grupa projektowa';
-    text='Czy chcesz zaakceptować zaproszenie do grupy projektu: ' + project_team.project.name+ '\n';
+    text = 'Czy chcesz zaakceptować zaproszenie do grupy projektu: ' + project_team.project.name + '\n';
     text += "Członkowie grupy: \n";
     for student in project_team.studentuser_set.all():
         text += student.profile.first_name + ' ' + student.profile.last_name + '\n'
