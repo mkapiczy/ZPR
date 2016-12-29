@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 
 from main.methods import createNewUserProfile, createNewTutorUser, createNewStudentUser, \
-    uniqueContraintValidationRedirect
+    uniqueContraintValidationRedirect, redirect_according_to_user_type
 from .forms import UserForm
 
 

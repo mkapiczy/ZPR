@@ -1,9 +1,7 @@
 from django.conf.urls import url
 
-from main.views import select_course
 from tutor_projects.views import read_projects_from_file, vacate_project, \
     minusTutorAllowedTeamsNumber, plusTutorAllowedTeamsNumber
-
 from . import views
 
 app_name = 'tutor_projects'
