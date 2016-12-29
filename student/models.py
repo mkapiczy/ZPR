@@ -16,8 +16,8 @@ class StudentUser(models.Model):
     status = models.BooleanField
     group = models.CharField(max_length=32)
     courses = models.ManyToManyField(Course)
-    projectTeams = models.ManyToManyField(ProjectTeam, null=True)
-    signedProjects = models.ManyToManyField('main.Project', null=True)
+    projectTeams = models.ManyToManyField(ProjectTeam)
+    signedProjects = models.ManyToManyField('main.Project')
 
     class Meta:
         db_table = 'student_user'
