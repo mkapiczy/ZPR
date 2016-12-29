@@ -67,3 +67,22 @@ def populateTemplateCourses(allCourses, tutor):
              'tutoruser_set': course.tutoruser_set, 'assigned': assigned})
 
     return templateCourses
+
+
+def assignTutorToCourse(request, pk):
+    tutor = getTutorUserFromRequest(request)
+    course = Course.objects.get(id=pk)
+    course.tutoruser_set.add(tutor)
+    course.save()
+    return redirect('tutor_courses:index')
+
+
+def assignTutorToCourse(request, pk):
+    tutor = getTutorUserFromRequest(request)
+    course = Course.objects.get(id=pk)
+    course.tutoruser_set.add(tutor)
+    course.save()
+    return redirect('tutor_courses:index')
+
+
+
