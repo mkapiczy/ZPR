@@ -35,11 +35,17 @@ class StudentUser(models.Model):
         return None
 
     def setSignedProjectForCourse(self, project, courseId):
-        alreadySignedCourse = self.getSignedProjectForCourse(courseId)
-        if alreadySignedCourse is not None:
-            self.signedProjects.remove(alreadySignedCourse)
+        alreadySignedProject = self.getSignedProjectForCourse(courseId)
+        if alreadySignedProject is not None:
+            self.signedProjects.remove(alreadySignedProject)
         self.signedProjects.add(project)
         self.save()
+
+    def removeSignedProjectForCourse(self, courseId):
+        alreadySignedProject = self.getSignedProjectForCourse(courseId)
+        if alreadySignedProject is not None:
+            self.signedProjects.remove(alreadySignedProject)
+            self.save()
 
     def getProjectTeamForCourse(self, courseId):
         for team in self.projectTeams.all():
@@ -53,3 +59,16 @@ class StudentUser(models.Model):
             self.projectTeams.remove(alreadyAssignedProjectTeam)
         self.projectTeams.add(projectTeam)
         self.save()
+
+    def removeProjectTeamForCourse(self, courseId):
+        alreadyAssignedProjectTeam = self.getProjectTeamForCourse(courseId)
+        if alreadyAssignedProjectTeam is not None:
+            self.projectTeams.remove(alreadyAssignedProjectTeam)
+            self.save()
+
+    def isStudentSignedToCourseProjectTeam(self, courseId):
+        alreadyAssignedProjectTeam = self.getProjectTeamForCourse(courseId)
+        if alreadyAssignedProjectTeam is not None and alreadyAssignedProjectTeam.accepted:
+            return True
+        else:
+            return False

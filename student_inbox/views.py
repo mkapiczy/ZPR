@@ -23,10 +23,10 @@ class InboxView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
+        selectedCourseId = request.session.get('selected_course_id')
         student = get_student_user_from_request(request)
         if student is not None:
-            request.session[
-                'isStudentSignedToProject'] = student.project_team is not None and student.project_team.accepted
+            request.session['isStudentSignedToProject'] = student.isStudentSignedToCourseProjectTeam(selectedCourseId)
             inbox = get_student_messages(student)
             markAllMessagesAsRead(inbox)
             refresh_inbox_status(request, student)

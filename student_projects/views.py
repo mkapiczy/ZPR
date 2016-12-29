@@ -112,7 +112,7 @@ class CreateProjectTeamView(View):
         if self.chosen_students_are_valid(chosen_students, project):
             projectTeam = createProjectTeam(project)
 
-            projectTeam = create_new_project_team_request(projectTeam)
+            projectTeamRequest = create_new_project_team_request(projectTeam)
 
             for student in chosen_students:
                 student.setSignedProjectForCourse(project, selectedCourseId)
@@ -120,12 +120,9 @@ class CreateProjectTeamView(View):
                 student.save()
 
                 newTeamMessage = NewProjectTeamMessage()
-                newTeamMessage.request = projectTeam
+                newTeamMessage.request = projectTeamRequest
                 newTeamMessage.message = createNewProjectTeamMessage(projectTeam)
-
-                studentInbox = getStudentInboxOrCreateIfNone(student)
-
-                newTeamMessage.user_inbox = getStudentInboxOrCreateIfNone
+                newTeamMessage.user_inbox = getStudentInboxOrCreateIfNone(student)
                 newTeamMessage.save()
 
             return redirect('student_projects:projects')

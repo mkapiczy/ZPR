@@ -58,15 +58,15 @@ def deleteTeamRequestAssignedToMessage(teamRequest):
     teamRequest.delete()
 
 
-def deleteNotAcceptedProjectTeamsAndTheirRequests(project_team):
-    all_project_teams_assigned_to_this_project = ProjectTeam.objects.filter(project=project_team.project)
-    for project_team in all_project_teams_assigned_to_this_project:
-        if not project_team.accepted:
-            project_team.project = None
-            for student in project_team.studentuser_set:
-                student.signed_project = None
-                student.project_team = None
-                student.save()
-            for request in project_team.newprojectteamrequest_set.all():
+def deleteNotAcceptedProjectTeamsAndTheirRequests(projectTeam):
+    allProjectTeamsAssignedToThisProject = ProjectTeam.objects.filter(project=projectTeam.project)
+    for projectTeam in allProjectTeamsAssignedToThisProject:
+        if not projectTeam.accepted:
+            projectTeam.project = None
+            projectTeam.course = None
+            for student in projectTeam.studentuser_set.all():
+                student.removeSignedProjectForCourse(projectTeam.course.id)
+                student.removeProjectTeamForCourse(projectTeam.course.id)
+            for request in projectTeam.newprojectteamrequest_set.all():
                 deleteTeamRequestAssignedToMessage(request)
-            project_team.delete()
+            projectTeam.delete()
