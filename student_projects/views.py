@@ -41,7 +41,7 @@ class ProjectsView(View):
                 request.session['student_team_registered'] = False
 
             refreshInboxStatus(request, student)
-            return render(request, self.template_name, {'course_projects': allCourseProjects})
+            return render(request, self.template_name, {'nbar': 'projects', 'course_projects': allCourseProjects})
         else:
             return redirect('student:index')
 
@@ -65,9 +65,10 @@ class UserProjectTeamView(View):
             studentProjectTeam = student.getProjectTeamForCourse(selectedCourseId)
             if studentProjectTeam is not None:
                 return render(request, self.template_name,
-                              {'projectTeam': studentProjectTeam, 'project': studentProjectTeam.project})
+                              {'nbar': 'team', 'projectTeam': studentProjectTeam,
+                               'project': studentProjectTeam.project})
             else:
-                return render(request, self.template_name)
+                return render(request, self.template_name, {'nbar': 'team'})
         else:
             return redirect('student:index')
 
@@ -100,7 +101,7 @@ class CreateProjectTeamView(View):
 
     def get(self, request, pk):
         form = self.populate_form(pk)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'nbar': 'projects','form': form})
 
     def post(self, request, pk):
         selectedCourseId = request.session.get('selected_course_id')
@@ -131,7 +132,7 @@ class CreateProjectTeamView(View):
                 'Wybierz liczbę studentów między: '
                 + project.minimum_students_number.__str__() + ' - '
                 + project.allowed_students_number.__str__() + ' !']
-            return render(request, self.template_name, {'form': form, 'custom_errors': errors})
+            return render(request, self.template_name, {'nbar': 'projects','form': form, 'custom_errors': errors})
 
     def populate_form(self, pk):
         project = get_object_or_404(Project, id=pk)

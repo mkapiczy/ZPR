@@ -22,13 +22,14 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'student:index' %}">{{ request.session.selected_course_shortname }}</a>
+            <a class="navbar-brand"
+               href="{% url 'student:index' %}">{{ request.session.selected_course_shortname }}</a>
         </div>
 
         <!-- Items -->
         <div class="collapse navbar-collapse" id="topNavBar">
             <ul class="nav navbar-nav">
-                <li class="dropdown">
+                <li class="dropdown ">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Wybór przedmiotu<span
                             class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
@@ -43,7 +44,7 @@
                         {% endif %}
                     </ul>
                 </li>
-                <li class="active">
+                <li class="{% if nbar == 'projects' %}active{% endif %}">
                     <a href="{% url 'student_projects:projects' %}">
                         <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>&nbsp;
                         Projekty
@@ -52,7 +53,7 @@
             </ul>
 
             <ul class="nav navbar-nav nav navbar-right">
-                <li class="">
+                <li class="{% if nbar == 'inbox' %}active{% endif %}">
                     <a href="{% url 'student_inbox:index' %}">
                         <span class="glyphicon glyphicon-inbox" aria-hidden="true"></span>&nbsp;
                         <span class="badge">
@@ -65,7 +66,7 @@
                     </a>
                 </li>
 
-                <li class="">
+                <li class="{% if nbar == 'team' %}active{% endif %}">
                     <a href="{% url 'student_projects:project-team-view' %}">
                         <span class="glyphicon glyphicon-education" aria-hidden="true"></span>&nbsp;
                         Twój projekt

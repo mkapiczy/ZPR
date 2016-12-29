@@ -30,7 +30,7 @@ class InboxView(View):
             inbox = getStudentMessages(student)
             markAllMessagesAsRead(inbox)
             refreshInboxStatus(request, student)
-            return render(request, self.template_name, {'inbox': inbox})
+            return render(request, self.template_name, {'nbar': 'inbox', 'inbox': inbox})
         else:
             return redirect('student_inbox:index')
 

@@ -36,5 +36,4 @@ class IndexView(View):
         studentCourses = student.courses.all()
         request.session['courses'] = studentCourses
         refreshInboxStatus(request, student)
-        return render(request, self.template_name, {'posts': posts})
-
+        return render(request, self.template_name, {'nbar': 'home', 'posts': posts})
