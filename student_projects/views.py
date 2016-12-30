@@ -11,7 +11,8 @@ from student.views import getStudentUserFromRequest
 from student_inbox.methods import refreshInboxStatus
 from student_projects.forms import CreateProjectTeamForm, SignedStudent
 from student_projects.methods import createNewProjectTeamRequest, \
-    createProjectTeam, createNewProjectTeamMessage, getChosenStudentsFromRequest, chosenStudentsAreValid
+    createProjectTeam, createNewProjectTeamMessage, getChosenStudentsFromRequest, chosenStudentsAreValid, \
+    tutorAllowedTeamsNumberNotExceeded
 
 
 class ProjectsView(View):
@@ -153,14 +154,5 @@ class CreateProjectTeamView(View):
         return form
 
 
-def tutorAllowedTeamsNumberNotExceeded(project):
-    tutor = project.tutor
-    tutorAllowedTeamsNumber = tutor.getTutorAllowedTeamsNumberByCourseId(project.course_id)
-    tutorTeams = tutor.getAllTeamsAssignedToTutorForCourse(project.course_id)
-    print('TutorTeams: ' + len(tutorTeams).__str__())
-    print('Allowed: ' + tutorAllowedTeamsNumber.__str__())
-    if len(tutorTeams) < tutorAllowedTeamsNumber:
-        return True
-    else:
-        return False
+
 

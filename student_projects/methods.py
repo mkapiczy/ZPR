@@ -50,3 +50,14 @@ def getChosenStudentsFromRequest(request):
     for student_id in students:
         chosen_students.append(StudentUser.objects.get(id=student_id))
     return chosen_students
+
+def tutorAllowedTeamsNumberNotExceeded(project):
+    tutor = project.tutor
+    tutorAllowedTeamsNumber = tutor.getTutorAllowedTeamsNumberByCourseId(project.course_id)
+    tutorTeams = tutor.getAllTeamsAssignedToTutorForCourse(project.course_id)
+    print('TutorTeams: ' + len(tutorTeams).__str__())
+    print('Allowed: ' + tutorAllowedTeamsNumber.__str__())
+    if len(tutorTeams) < tutorAllowedTeamsNumber:
+        return True
+    else:
+        return False
