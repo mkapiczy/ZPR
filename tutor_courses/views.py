@@ -77,12 +77,5 @@ def assignTutorToCourse(request, pk):
     return redirect('tutor_courses:index')
 
 
-def assignTutorToCourse(request, pk):
-    tutor = getTutorUserFromRequest(request)
-    course = Course.objects.get(id=pk)
-    course.tutoruser_set.add(tutor)
-    course.save()
-    return redirect('tutor_courses:index')
-
 
 

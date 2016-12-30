@@ -104,19 +104,17 @@ class ProjectDelete(DeleteView):
 
 
 def plusTutorAllowedTeamsNumber(request):
-    tutorAllowedTeamsNumber = request.POST['tutorAllowedTeamsNumber']
     tutor = getTutorUserFromRequest(request)
     tutorCourse = tutor.getTutorCourseByCourseId(request.session.get('selected_course_id'))
-    tutorCourse.allowedTeamsNumber = int(tutorAllowedTeamsNumber) + 1
+    tutorCourse.allowedTeamsNumber += 1
     tutorCourse.save()
     return redirect('tutor_projects:projects')
 
 
 def minusTutorAllowedTeamsNumber(request):
-    tutorAllowedTeamsNumber = request.POST['tutorAllowedTeamsNumber']
     tutor = getTutorUserFromRequest(request)
     tutorCourse = tutor.getTutorCourseByCourseId(request.session.get('selected_course_id'))
-    tutorCourse.allowedTeamsNumber = int(tutorAllowedTeamsNumber) - 1
+    tutorCourse.allowedTeamsNumber -= 1
     tutorCourse.save()
     return redirect('tutor_projects:projects')
 

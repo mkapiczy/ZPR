@@ -13,8 +13,6 @@
                                   method="post"
                                   style="display: inline;">
                                 {% csrf_token %}
-                                <input type="hidden" name="tutorAllowedTeamsNumber" class="form-control input-number"
-                                       value="{{ tutorAllowedTeamsNumber }}" min="0">
                                 <button class="btn btn-default btn-number" data-type="minus"
                                         data-field="tutorAllowedTeamsNumber">
                                     <span class="glyphicon glyphicon-minus"></span>
@@ -26,8 +24,6 @@
                                   method="post"
                                   style="display: inline;">
                                 {% csrf_token %}
-                                <input type="hidden" name="tutorAllowedTeamsNumber" class="form-control input-number"
-                                       value="{{ tutorAllowedTeamsNumber }}" min="0">
                                 <button class="btn btn-default btn-number" data-type="plus"
                                         data-field="tutorAllowedTeamsNumber">
                                     <span class="glyphicon glyphicon-plus"></span>
