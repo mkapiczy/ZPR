@@ -19,11 +19,13 @@ def createNewTutorUser(profile):
     tutor = TutorUser()
     tutor.profile = profile
     tutor.save()
+    return tutor
 
 def createNewStudentUser(profile):
     student = StudentUser()
     student.profile = profile
     student.save()
+    return student
 
 def uniqueContraintValidationRedirect(self, request, form):
     return render(request, self.template_name, {'form': form, 'error_message': 'Istnieje już użytkownik o takich danych!'})
