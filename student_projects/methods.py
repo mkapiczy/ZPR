@@ -17,15 +17,6 @@ def createNewProjectTeamRequest(project_team):
     return new_team_request
 
 
-def getStudentInboxOrCreateIfNone(student):
-    if student.profile.inbox is None:
-        inbox = UserInbox(user_profile=student.profile)
-        inbox.save()
-        student.profile.inbox = inbox
-        student.save()
-    return student.profile.inbox
-
-
 def clear_project_signed_users_set(project):
     for student in project.studentuser_set.all():
         student.signed_project = None

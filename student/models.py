@@ -1,6 +1,6 @@
 from django.db import models
 
-from main.models import Project, Course
+from main.models import Project, Course, UserInbox
 
 
 class ProjectTeam(models.Model):
@@ -72,3 +72,11 @@ class StudentUser(models.Model):
             return True
         else:
             return False
+
+    def getStudentInboxOrCreateIfNone(self):
+        if self.profile.inbox is None:
+            inbox = UserInbox(user_profile=self.profile)
+            inbox.save()
+            self.profile.inbox = inbox
+            self.save()
+        return self.profile.inbox

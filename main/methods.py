@@ -1,7 +1,7 @@
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 
-from main.models import UserProfile
+from main.models import UserProfile, Course
 from student.models import StudentUser
 from tutor.models import TutorUser
 

@@ -10,7 +10,7 @@ from main.permissions import has_student_permissions
 from student.views import getStudentUserFromRequest
 from student_inbox.methods import refreshInboxStatus
 from student_projects.forms import CreateProjectTeamForm, SignedStudent
-from student_projects.methods import getStudentInboxOrCreateIfNone, createNewProjectTeamRequest, \
+from student_projects.methods import createNewProjectTeamRequest, \
     createProjectTeam, createNewProjectTeamMessage, getChosenStudentsFromRequest, chosenStudentsAreValid
 
 
@@ -131,7 +131,7 @@ class CreateProjectTeamView(View):
                 newTeamMessage = NewProjectTeamMessage()
                 newTeamMessage.request = projectTeamRequest
                 newTeamMessage.message = createNewProjectTeamMessage(projectTeam)
-                newTeamMessage.user_inbox = getStudentInboxOrCreateIfNone(student)
+                newTeamMessage.user_inbox = student.getStudentInboxOrCreateIfNone()
                 newTeamMessage.save()
 
             return redirect('student_projects:projects')
