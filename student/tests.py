@@ -8,7 +8,7 @@ from main.views import createNewUserProfile, createNewStudentUser
 from student.methods import getStudentUserFromRequest
 
 
-class MainTestCase(TestCase):
+class StudentUserTestCase(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
