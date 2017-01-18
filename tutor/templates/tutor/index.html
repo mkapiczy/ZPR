@@ -32,11 +32,6 @@
                        <span class="badge badge-success">Autor: {{ post.tutor.profile.last_name }} {{ post.tutor.profile.first_name }} -- Post
                             dodany: {{ post.creation_time }}</span>
                         </div>
-                        <!-- View Details -->
-                        <a href="" class="btn btn-primaty btn-sm" role="button">
-                            View Details
-                        </a>
-
                         <!-- Delete Album -->
                         {% if post.tutor.profile.user_id == request.user.id %}
                             <form action="{% url 'tutor_posts:post-delete' post.id %}" method="post"
