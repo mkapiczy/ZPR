@@ -78,12 +78,15 @@ class ProjectCreate(View):
         if form.is_valid():
             project = form.save(commit=False)
 
-            try:
-                saveProject(project, request)
-            except IntegrityError as e:
+            if project.allowed_teams_number <= 0 or project.minimum_students_number <= 0 or project.allowed_students_number <= 0:
                 return render(request, self.template_name,
-                              {'nbar': 'projects', 'form': form, 'error_message': 'Taki projekt już istnieje!'})
-
+                            {'nbar': 'projects', 'form': form, 'error_message': 'Parametry liczbowe mogą przyjmować jedynie wartości większe od 0!'})
+            else:
+                try:
+                    saveProject(project, request)
+                except IntegrityError as e:
+                    return render(request, self.template_name,
+                                  {'nbar': 'projects', 'form': form, 'error_message': 'Taki projekt już istnieje!'})
             return redirect('tutor_projects:projects')
 
 
@@ -118,7 +121,7 @@ def plusTutorAllowedTeamsNumber(request):
 def minusTutorAllowedTeamsNumber(request):
     tutor = getTutorUserFromRequest(request)
     tutorCourse = tutor.getTutorCourseByCourseId(request.session.get('selected_course_id'))
-    if(tutorCourse.allowedTeamsNumber > 0):
+    if (tutorCourse.allowedTeamsNumber > 0):
         tutorCourse.allowedTeamsNumber -= 1
         tutorCourse.save()
     return redirect('tutor_projects:projects')
