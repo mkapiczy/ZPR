@@ -97,12 +97,10 @@ class UpdateStudent(View):
 
         if form.is_valid():
             student_id = pk
-            print(student_id)
             if (student_id is not None):
                 student = get_object_or_404(StudentUser, id=student_id)
                 album_number = form.cleaned_data['album_number']
                 group = form.cleaned_data['group']
-                print(album_number)
                 student.album_number = album_number
                 student.group = group
                 try:

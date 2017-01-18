@@ -15,7 +15,6 @@ class UserProfile(models.Model):
     inbox = models.OneToOneField('UserInbox', null=True)
 
     def is_student_user(self):
-        print(self.user.id)
         if not self.user.is_tutor:
             return True
         else:

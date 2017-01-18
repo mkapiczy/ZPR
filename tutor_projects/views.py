@@ -57,7 +57,6 @@ def read_projects_from_file(request):
                 project.description = row
                 saveProject(project, request)
 
-        print(len(descriptions))
         request.session['desc'] = descriptions
         return redirect('tutor_projects:projects')
     else:
@@ -126,7 +125,6 @@ def minusTutorAllowedTeamsNumber(request):
 
 
 def vacate_project(request, pk):
-    print('hello')
     project = get_object_or_404(Project, id=pk)
     for projectTeam in project.projectteam_set.all():
         for student in projectTeam.studentuser_set.all():

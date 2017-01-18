@@ -39,7 +39,6 @@ def accept_project_team_message(request, pk):
     message = acceptSingleTeamMessage(pk)
 
     if allMessagesAssignedToThisTeamRequestAreAccepted(message):
-        print('Request accepted!')
         projectTeam = acceptProjectTeamAssignedToMessage(message)
 
         deleteTeamRequestAssignedToMessage(message.request)
@@ -58,5 +57,4 @@ def reject_project_team(request, pk):
     message.request.project_team.delete()
     message.request.delete()
     message.delete()
-    print('Request deleted')
     return redirect('student_inbox:index')

@@ -29,8 +29,6 @@ def createNewProjectTeamMessage(project_team):
     text += "Członkowie grupy: \n";
     for student in project_team.studentuser_set.all():
         text += student.profile.first_name + ' ' + student.profile.last_name + '\n'
-    print(title)
-    print(text)
     message = Message(title=title, text=text)
     message.save()
     return message
@@ -55,8 +53,6 @@ def tutorAllowedTeamsNumberNotExceeded(project):
     tutor = project.tutor
     tutorAllowedTeamsNumber = tutor.getTutorAllowedTeamsNumberByCourseId(project.course_id)
     tutorTeams = tutor.getAllTeamsAssignedToTutorForCourse(project.course_id)
-    print('TutorTeams: ' + len(tutorTeams).__str__())
-    print('Allowed: ' + tutorAllowedTeamsNumber.__str__())
     if len(tutorTeams) < tutorAllowedTeamsNumber:
         return True
     else:
