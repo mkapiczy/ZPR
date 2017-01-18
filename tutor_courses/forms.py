@@ -11,3 +11,8 @@ class CourseForm(forms.ModelForm):
             'description': Textarea(attrs={'cols': 80, 'rows': 15})
         }
         fields = ['name', 'short_name']
+
+    def __init__(self, *args, **kwargs):
+        super(CourseForm, self).__init__(*args, **kwargs)
+        self.fields['name'].label = 'Nazwa'
+        self.fields['short_name'].label = 'Nazwa skrócona'

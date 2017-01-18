@@ -9,3 +9,4 @@ class SignedStudent:
 
 class CreateProjectTeamForm(forms.Form):
     signed_students = []
+

@@ -11,6 +11,14 @@ class UserForm(forms.ModelForm):
         model = MyUser
         fields = ['first_name', 'last_name','is_tutor', 'password']
 
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].label = 'Imię'
+        self.fields['last_name'].label = 'Nazwisko'
+        self.fields['is_tutor'].label = 'Prowadzący'
+        self.fields['password'].label = 'Hasło'
+
+
 
 
 

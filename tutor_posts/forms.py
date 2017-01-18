@@ -18,4 +18,10 @@ class CreatePostForm(ModelForm):
             'content': Textarea(attrs={'cols': 80, 'rows': 15}),
             'title': Textarea(attrs={'cols': 80, 'rows': 2})
         }
-        fields = ['title', 'content', 'general_post', 'course']
+        fields = ['title', 'content', 'course']
+
+    def __init__(self, *args, **kwargs):
+        super(CreatePostForm, self).__init__(*args, **kwargs)
+        self.fields['title'].label = 'Tytuł'
+        self.fields['content'].label = 'Treść'
+        self.fields['course'].label = 'Przedmiot'
