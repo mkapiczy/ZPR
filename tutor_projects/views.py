@@ -119,8 +119,9 @@ def plusTutorAllowedTeamsNumber(request):
 def minusTutorAllowedTeamsNumber(request):
     tutor = getTutorUserFromRequest(request)
     tutorCourse = tutor.getTutorCourseByCourseId(request.session.get('selected_course_id'))
-    tutorCourse.allowedTeamsNumber -= 1
-    tutorCourse.save()
+    if(tutorCourse.allowedTeamsNumber > 0):
+        tutorCourse.allowedTeamsNumber -= 1
+        tutorCourse.save()
     return redirect('tutor_projects:projects')
 
 
