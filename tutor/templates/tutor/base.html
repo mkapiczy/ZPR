@@ -60,13 +60,21 @@
                         Przedmioty
                     </a>
                 </li>
+                {% if request.session.isAdmin %}
+                    <li class="{% if nbar == 'courses' %}active{% endif %}">
+                        <a href="#">
+                            <span class="glyphicon glyphicon-book" aria-hidden="true"></span>&nbsp;
+                            Prowadzący
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
 
             <ul class="nav navbar-nav nav navbar-right">
                 <li class="">
                     <a href="{% url 'main:logout' %}">
                         <span class="glyphicon glyphicon-off" aria-hidden="true"></span>&nbsp;
-                       Wyloguj
+                        Wyloguj
                     </a>
                 </li>
             </ul>

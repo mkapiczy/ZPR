@@ -118,17 +118,19 @@ class CreateProjectTeamView(View):
 
         project = get_object_or_404(Project, id=pk)
         chosenStudents = getChosenStudentsFromRequest(request)
-
         if chosenStudentsAreValid(chosenStudents, project):
             projectTeam = createProjectTeam(project)
 
-            projectTeamRequest = createNewProjectTeamRequest(projectTeam)
+
 
             for student in chosenStudents:
                 student.setSignedProjectForCourse(project, selectedCourseId)
                 student.setProjectTeamForCourse(projectTeam, selectedCourseId)
                 student.save()
 
+            projectTeamRequest = createNewProjectTeamRequest(projectTeam)
+
+            for student in chosenStudents:
                 newTeamMessage = NewProjectTeamMessage()
                 newTeamMessage.request = projectTeamRequest
                 newTeamMessage.message = createNewProjectTeamMessage(projectTeam)

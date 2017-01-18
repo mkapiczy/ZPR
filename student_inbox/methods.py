@@ -8,7 +8,8 @@ def getStudentMessages(student):
     messages = []
     if student.profile.inbox and student.profile.inbox.newprojectteammessage_set:
         for msg in student.profile.inbox.newprojectteammessage_set.all():
-            messages.append(msg)
+            if not msg.accepted:
+                messages.append(msg)
     return messages
 
 def refreshInboxStatus(request, student):

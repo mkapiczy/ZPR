@@ -75,8 +75,8 @@ class StudentUser(models.Model):
 
     def getStudentInboxOrCreateIfNone(self):
         if self.profile.inbox is None:
-            inbox = UserInbox(user_profile=self.profile)
-            inbox.save()
+            UserInbox.objects.get_or_create(user_profile=self.profile)
+            inbox = UserInbox.objects.get(user_profile=self.profile)
             self.profile.inbox = inbox
-            self.save()
+            self.profile.save()
         return self.profile.inbox

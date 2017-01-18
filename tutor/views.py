@@ -15,6 +15,9 @@ class IndexView(View):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         if has_tutor_permissions(request.user):
+            tutor = getTutorUserFromRequest(request)
+            if tutor.is_admin:
+                request.session['isAdmin'] = True
             return super(IndexView, self).dispatch(request, *args, **kwargs)
         else:
             return HttpResponseForbidden('User has no access rights for viewing this page')

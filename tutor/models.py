@@ -7,6 +7,7 @@ from student.models import ProjectTeam
 class TutorUser(models.Model):
     profile = models.ForeignKey(UserProfile)
     courses = models.ManyToManyField(Course)
+    is_admin = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'tutor_user'
