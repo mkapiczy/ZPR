@@ -80,7 +80,8 @@ class ProjectCreate(View):
 
             if project.allowed_teams_number <= 0 or project.minimum_students_number <= 0 or project.allowed_students_number <= 0:
                 return render(request, self.template_name,
-                            {'nbar': 'projects', 'form': form, 'error_message': 'Parametry liczbowe mogą przyjmować jedynie wartości większe od 0!'})
+                              {'nbar': 'projects', 'form': form,
+                               'error_message': 'Parametry liczbowe mogą przyjmować jedynie wartości większe od 0!'})
             else:
                 try:
                     saveProject(project, request)

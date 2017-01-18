@@ -1,3 +1,4 @@
+import os
 from io import TextIOWrapper
 
 from django.http import HttpResponseForbidden
@@ -57,10 +58,8 @@ def delayErrorAlertFade(request, alert):
 
 def isFileCorrect(fileName, allowedExtension, request):
     if fileName in request.FILES:
-        file = TextIOWrapper(request.FILES[fileName].file, encoding='utf-8')
-        if file is not None and hasattr(file, 'name'):
-            name, extension = os.path.splitext(file.name)
-            if extension == allowedExtension:
+        file = request.FILES[fileName]
+        if file is not None and str(file).endswith(allowedExtension):
                 return True
     return False
 
