@@ -137,7 +137,7 @@ class CreateProjectTeamView(View):
 
             return redirect('student_projects:projects')
         else:
-            form = self.populate_form(pk)
+            form = self.populate_form(project)
             errors = [
                 'Wybierz liczbę studentów między: '
                 + project.minimum_students_number.__str__() + ' - '
