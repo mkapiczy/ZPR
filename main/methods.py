@@ -1,3 +1,5 @@
+from io import TextIOWrapper
+
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -52,3 +54,16 @@ def delayErrorAlertFade(request, alert):
         request.session['delayClearParam'] = None
     else:
         request.session[alert] = None
+
+def isFileCorrect(fileName, allowedExtension, request):
+    if fileName in request.FILES:
+        file = TextIOWrapper(request.FILES[fileName].file, encoding='utf-8')
+        if file is not None and hasattr(file, 'name'):
+            name, extension = os.path.splitext(file.name)
+            if extension == allowedExtension:
+                return True
+    return False
+
+def setWrongFileSessionParam(request):
+    request.session['delayClearParam'] = True
+    request.session['wrongFile'] = 'Zły format pliku! Dozwolony format to .csv'

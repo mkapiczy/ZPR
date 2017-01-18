@@ -1,4 +1,5 @@
 import csv
+import os
 from io import TextIOWrapper
 from sqlite3 import IntegrityError
 
@@ -11,6 +12,7 @@ from django.views import View
 from django.views.generic import DeleteView
 from django.views.generic import UpdateView
 
+from main.methods import delayErrorAlertFade, isFileCorrect, setWrongFileSessionParam
 from main.models import Project
 from main.permissions import has_tutor_permissions
 from tutor.methods import getTutorUserFromRequest
@@ -30,6 +32,7 @@ class ProjectsView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
+        delayErrorAlertFade(request, 'wrongFile')
         selectedCourseId = request.session.get('selected_course_id')
         if (selectedCourseId is not None):
             tutor = getTutorUserFromRequest(request)
@@ -43,21 +46,23 @@ class ProjectsView(View):
 
 
 def read_projects_from_file(request):
-    file = TextIOWrapper(request.FILES['projects_file'].file, encoding='utf-8')
+    if isFileCorrect('projects_file', '.csv', request):
+        file = TextIOWrapper(request.FILES['projects_file'].file, encoding='utf-8')
+        reader = csv.reader(file, delimiter=',')
+        descriptions = []
+        for row in reader:
+            if (row):
+                project = Project()
+                project.name = 'Projekt'
+                project.description = row
+                saveProject(project, request)
 
-    reader = csv.reader(file, delimiter=',')
-    descriptions = []
-    for row in reader:
-        if (row):
-            project = Project()
-            project.name = 'Projekt'
-            project.description = row
-            saveProject(project, request)
-
-    print(len(descriptions))
-    request.session['desc'] = descriptions
-
-    return redirect('tutor_projects:projects')
+        print(len(descriptions))
+        request.session['desc'] = descriptions
+        return redirect('tutor_projects:projects')
+    else:
+        setWrongFileSessionParam(request)
+        return redirect('tutor_projects:projects')
 
 
 class ProjectCreate(View):

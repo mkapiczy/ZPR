@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from main.methods import delayErrorAlertFade
+from main.methods import delayErrorAlertFade, setWrongFileSessionParam, isFileCorrect
 from main.models import MyUser, UserProfile
 from main.permissions import has_tutor_permissions
 from main.views import uniqueContraintValidationRedirect
@@ -139,28 +139,32 @@ class DeleteStudent(View):
 
 
 def read_students_from_file(request):
-    file = TextIOWrapper(request.FILES['students_file'].file, encoding='utf-8')
-    reader = csv.reader(file, delimiter=';')
-    notAddedStudents = []
-    for row in reader:
-        if (row):
-            if (len(row) > 1 and not re.match("Nr", row[0])):
-                first_name = row[2].split(' ', 1)[0]
-                last_name = row[1]
-                album_number = row[3]
-                group = row[6]
+    if isFileCorrect('students_file', '.csv', request):
+        file = TextIOWrapper(request.FILES['students_file'].file, encoding='utf-8')
+        reader = csv.reader(file, delimiter=';')
+        notAddedStudents = []
+        for row in reader:
+            if (row):
+                if (len(row) > 1 and not re.match("Nr", row[0])):
+                    first_name = row[2].split(' ', 1)[0]
+                    last_name = row[1]
+                    album_number = row[3]
+                    group = row[6]
 
-                try:
-                    user = createSystemUser(first_name, last_name, album_number)
-                    if user is not None:
-                        myUser = createMyUser(user)
-                        profile = createNewUserProfile(myUser)
-                        createNewStudentUser(profile, album_number, group, request)
-                    else:
-                        if (not addStudentToSelectedCourse(album_number, request)):
-                            notAddedStudents.append(first_name + ' ' + last_name)
-                except IntegrityError as e:
-                    notAddedStudents.append([first_name + ' ' + last_name])
-                    pass
-    setNotAddedStudentsRequestParam(notAddedStudents, request)
-    return redirect('tutor_students:index')
+                    try:
+                        user = createSystemUser(first_name, last_name, album_number)
+                        if user is not None:
+                            myUser = createMyUser(user)
+                            profile = createNewUserProfile(myUser)
+                            createNewStudentUser(profile, album_number, group, request)
+                        else:
+                            if (not addStudentToSelectedCourse(album_number, request)):
+                                notAddedStudents.append(first_name + ' ' + last_name)
+                    except IntegrityError as e:
+                        notAddedStudents.append([first_name + ' ' + last_name])
+                        pass
+        setNotAddedStudentsRequestParam(notAddedStudents, request)
+        return redirect('tutor_students:index')
+    else:
+        setWrongFileSessionParam(request)
+        return redirect('tutor_projects:projects')
