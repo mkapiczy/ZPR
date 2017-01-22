@@ -30,6 +30,15 @@ class StudentProjectTestCase(TestCase):
         profile = createNewUserProfile(myUser)
 
         tutor = createNewTutorUser(profile)
+
+        project = Project()
+        project.id = 1
+        project.allowed_students_number = 3
+        project.minimum_students_number = 2
+        project.course_id = 1
+        project.tutor_id = tutor.id
+        project.save()
+
         self.tutor = tutor
 
     def test_chosenStudentsAreValid(self):
