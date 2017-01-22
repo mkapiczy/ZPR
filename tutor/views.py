@@ -27,11 +27,11 @@ class IndexView(View):
         selectedCourseId = request.session.get('selected_course_id')
         if selectedCourseId is not None:
             try:
-                posts = Post.objects.filter(course=selectedCourseId)
+                posts = Post.objects.filter(course=selectedCourseId).order_by('-creation_time')
             except Post.DoesNotExist:
                 pass
         else:
-            posts = Post.objects.all()
+            posts = Post.objects.all().order_by('-creation_time')
 
         tutor = getTutorUserFromRequest(request)
         tutorCourses= tutor.courses.all()
