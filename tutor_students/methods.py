@@ -3,14 +3,15 @@ from django.shortcuts import get_object_or_404
 
 from main.models import MyUser, UserProfile, Course
 from student.models import StudentUser
+from tutor.models import TutorUser
 
 
 def setNotAddedStudentsRequestParam(notAddedStudents, request):
     request.session['delayClearParam'] = True
     request.session['notAddedStudents'] = notAddedStudents
 
-def createSystemUser(first_name, last_name, album_number):
-    password = album_number
+def createSystemUser(first_name, last_name, password):
+    password = password
     username = first_name + last_name
     try:
         user = User.objects.get(username=username)
@@ -79,3 +80,20 @@ def addStudentToSelectedCourse(album_number, request):
     else:
         student.courses.add(course)
         return True
+
+
+def addTutorToSelectedCourse(id, request):
+    tutor = get_object_or_404(TutorUser, id=id)
+    course_id = request.session.get('selected_course_id')
+    course = get_object_or_404(Course, id=course_id)
+    if tutor.courses.filter(id=course_id).exists():
+        return False
+    else:
+        tutor.courses.add(course)
+        return True
+
+def removeTutorFromSelectedCourse(tutor, request):
+    course_id = request.session.get('selected_course_id')
+    course = get_object_or_404(Course, id=course_id)
+    tutor.courses.remove(course)
+    tutor.save()

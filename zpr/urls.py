@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^zpr/tutor/projects/', include('tutor_projects.urls')),
     url(r'^zpr/tutor/students/', include('tutor_students.urls')),
     url(r'^zpr/tutor/courses/', include('tutor_courses.urls')),
+    url(r'^zpr/tutor/tutors/', include('tutor_tutors.urls')),
 
 ]
 

@@ -1,0 +1,56 @@
+<!DOC{% extends 'tutor/base.html' %}
+{% block title %}Prowadzący{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <a href="{% url 'tutor_tutors:tutor-add' %}">
+                    <button type="button" class="btn btn-success">
+                        <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj prowadzącego
+                    </button>
+                </a> <br><br>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                      {% if request.session.notAddedStudents %}
+                            <div class="alert alert-warning">
+                                Niektórzy prowadzący nie zostali dodani ponieważ już istnieją w systemie:<br>
+                                {% for notAdded in request.session.notAddedStudents %}
+                                    {{ notAdded }}<br>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="thumbnail caption">
+                            Lista prowadzących
+                        </div>
+                        <hr>
+                        {% if course_tutors %}
+                            {% for tutor in course_tutors %}
+                                <div class="caption">
+                                    Login użytkownika: {{ tutor.profile.username }}<br><br>
+                                    Imię i nazwisko: {{ tutor.profile.first_name }} {{ tutor.profile.last_name }}<br><br>
+                                    <!-- Delete Tutor -->
+                                    <form action="{% url 'tutor_tutors:tutor-delete' tutor.id %}" method="post"
+                                          style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="tutor_id" value="{{ tutor.id }}"/>
+                                        <button type="submit" class="btn btn-default btn-sm" id="deleteUserButton">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </button>
+                                    </form>
+                                </div><br>
+                                <hr>
+                            {% endfor %}
+                        {% endif %}
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+

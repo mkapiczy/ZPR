@@ -1,8 +1,8 @@
 import csv
-import os
 from io import TextIOWrapper
 from sqlite3 import IntegrityError
 
+import requests
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
@@ -18,7 +18,6 @@ from main.permissions import has_tutor_permissions
 from tutor.methods import getTutorUserFromRequest
 from tutor_projects.forms import ProjectForm
 from tutor_projects.methods import saveProject
-
 
 class ProjectsView(View):
     template_name = 'tutor_projects/projects_index.html'
