@@ -170,7 +170,7 @@ def read_students_from_file(request):
         return redirect('tutor_students:index')
     else:
         setWrongFileSessionParam(request)
-        return redirect('tutor_projects:projects')
+        return redirect('tutor_students:index')
 
 
 
