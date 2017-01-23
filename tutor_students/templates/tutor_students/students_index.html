@@ -48,6 +48,7 @@
                                     Nr albumu: {{ student.album_number }} <br><br>
                                     Imię i
                                     nazwisko: {{ student.profile.first_name }} {{ student.profile.last_name }}<br><br>
+                                    Grupa: {{ student.group }}<br><br>
                                     <!-- Delete Project -->
                                     <form action="{% url 'tutor_students:student-delete' student.id %}" method="post"
                                           style="display: inline;">
