@@ -56,13 +56,13 @@ class CreateStudent(View):
 
     def post(self, request):
         form = self.form_class(request.POST)
-
+        notAddedStudents = []
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             album_number = form.cleaned_data['album_number']
             group = form.cleaned_data['group']
-            notAddedStudents = []
+
             try:
                 user = createSystemUser(first_name, last_name, album_number)
                 if (user is not None):
@@ -147,7 +147,6 @@ def read_students_from_file(request):
         parsedStudentsJson = getJson.parseFile(fileDest)
         parsedStudents = json.loads(parsedStudentsJson)
         os.remove(settings.MEDIA_ROOT + "studenci.csv")
-
         for student in parsedStudents["Data"]:
             first_name = student["Imiona"].split(' ', 1)[0]
             last_name = student["Nazwisko"]
@@ -161,11 +160,12 @@ def read_students_from_file(request):
                     profile = createNewUserProfile(myUser)
                     createNewStudentUser(profile, album_number, group, request)
                 else:
-                    if (not addStudentToSelectedCourse(album_number, request)):
+                    if not addStudentToSelectedCourse(album_number, request):
                         notAddedStudents.append(first_name + ' ' + last_name)
             except IntegrityError as e:
                 notAddedStudents.append([first_name + ' ' + last_name])
                 pass
+
         setNotAddedStudentsRequestParam(notAddedStudents, request)
         return redirect('tutor_students:index')
     else:

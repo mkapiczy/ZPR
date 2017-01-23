@@ -5,6 +5,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12 col-md-12">
+                {% if request.session.wrongFile %}
+                    <div class="alert alert-warning">
+                        {{ request.session.wrongFile }}
+                    </div>
+                {% endif %}
                 <form class="form-horizontal" action="{% url 'tutor_students:read_students_from_file' %}"
                       method="post" enctype="multipart/form-data">
                     {% csrf_token %}
