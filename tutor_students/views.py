@@ -1,8 +1,11 @@
 import csv
+import json
+import os
 import re
 from io import TextIOWrapper
 from sqlite3 import IntegrityError
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -19,6 +22,7 @@ from student.models import StudentUser
 from tutor_students.forms import StudentForm
 from tutor_students.methods import addStudentToSelectedCourse, createNewStudentUser, createNewUserProfile, createMyUser, \
     createSystemUser, setNotAddedStudentsRequestParam
+from getJson import getJson
 
 
 class StudentsView(View):
@@ -141,31 +145,36 @@ def read_students_from_file(request):
         file = TextIOWrapper(request.FILES['students_file'].file, encoding='utf-8')
         reader = csv.reader(file, delimiter=';')
         notAddedStudents = []
-        for row in reader:
-            if (row):
-                if (len(row) > 1 and not re.match("Nr", row[0])):
-                    first_name = row[2].split(' ', 1)[0]
-                    last_name = row[1]
-                    album_number = row[3]
-                    group = row[6]
+        fileDest = saveFile(request)
+        parsedStudentsJson = getJson.parseFile(fileDest)
+        parsedStudents = json.loads(parsedStudentsJson)
+        os.remove(settings.MEDIA_ROOT + "studenci.csv")
 
-                    try:
-                        user = createSystemUser(first_name, last_name, album_number)
-                        if user is not None:
-                            myUser = createMyUser(user)
-                            profile = createNewUserProfile(myUser)
-                            createNewStudentUser(profile, album_number, group, request)
-                        else:
-                            if (not addStudentToSelectedCourse(album_number, request)):
-                                notAddedStudents.append(first_name + ' ' + last_name)
-                    except IntegrityError as e:
-                        notAddedStudents.append([first_name + ' ' + last_name])
-                        pass
+        for student in parsedStudents["Data"]:
+            first_name = student["Imiona"].split(' ', 1)[0]
+            last_name = student["Nazwisko"]
+            album_number = student["Indeks"]
+            group = student["Grupa"]
+
+            try:
+                user = createSystemUser(first_name, last_name, album_number)
+                if user is not None:
+                    myUser = createMyUser(user)
+                    profile = createNewUserProfile(myUser)
+                    createNewStudentUser(profile, album_number, group, request)
+                else:
+                    if (not addStudentToSelectedCourse(album_number, request)):
+                        notAddedStudents.append(first_name + ' ' + last_name)
+            except IntegrityError as e:
+                notAddedStudents.append([first_name + ' ' + last_name])
+                pass
         setNotAddedStudentsRequestParam(notAddedStudents, request)
         return redirect('tutor_students:index')
     else:
         setWrongFileSessionParam(request)
         return redirect('tutor_projects:projects')
+
+
 
 def delete_all_students(request):
     selectedCourseId = request.session.get('selected_course_id')
@@ -174,3 +183,9 @@ def delete_all_students(request):
         student.courses.remove(course)
         student.save()
     return redirect('tutor_students:index')
+
+def saveFile(request):
+    with open(settings.MEDIA_ROOT + "studenci.csv", 'wb+') as destination:
+        for chunk in request.FILES['students_file'].chunks():
+            destination.write(chunk)
+        return destination.name
