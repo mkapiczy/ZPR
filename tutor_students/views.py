@@ -142,8 +142,6 @@ class DeleteStudent(View):
 
 def read_students_from_file(request):
     if isFileCorrect('students_file', '.csv', request):
-        file = TextIOWrapper(request.FILES['students_file'].file, encoding='utf-8')
-        reader = csv.reader(file, delimiter=';')
         notAddedStudents = []
         fileDest = saveFile(request)
         parsedStudentsJson = getJson.parseFile(fileDest)
