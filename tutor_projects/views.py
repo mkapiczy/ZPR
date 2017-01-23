@@ -13,7 +13,7 @@ from django.views.generic import DeleteView
 from django.views.generic import UpdateView
 
 from main.methods import delayErrorAlertFade, isFileCorrect, setWrongFileSessionParam
-from main.models import Project
+from main.models import Project, Course
 from main.permissions import has_tutor_permissions
 from tutor.methods import getTutorUserFromRequest
 from tutor_projects.forms import ProjectForm
@@ -129,6 +129,19 @@ def minusTutorAllowedTeamsNumber(request):
 
 def vacate_project(request, pk):
     project = get_object_or_404(Project, id=pk)
+    vacateProject(project)
+    return redirect('tutor_projects:projects')
+
+def delete_all_projects(request):
+    selectedCourseId = request.session.get('selected_course_id')
+    course = Course.objects.get(id=selectedCourseId)
+    for project in course.project_set.all():
+        vacateProject(project)
+        project.delete()
+    return redirect('tutor_projects:projects')
+
+
+def vacateProject(project):
     for projectTeam in project.projectteam_set.all():
         for student in projectTeam.studentuser_set.all():
             for studentProjectTeam in student.projectTeams.all():
@@ -137,6 +150,4 @@ def vacate_project(request, pk):
                     student.save()
         projectTeam.project = None
         projectTeam.delete()
-
     project.setProjectAvailable()
-    return redirect('tutor_projects:projects')

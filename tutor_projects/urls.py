@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from tutor_projects.views import read_projects_from_file, vacate_project, \
-    minusTutorAllowedTeamsNumber, plusTutorAllowedTeamsNumber
+    minusTutorAllowedTeamsNumber, plusTutorAllowedTeamsNumber, delete_all_projects
 from . import views
 
 app_name = 'tutor_projects'
@@ -18,5 +18,6 @@ urlpatterns = [
     url(r'(?P<pk>[0-9]+)/vacate$', vacate_project, name='project-vacate'),
     url(r'teamsNumber/plus$', plusTutorAllowedTeamsNumber, name='project-teams-plus'),
     url(r'teamsNumber/minus$', minusTutorAllowedTeamsNumber, name='project-teams-minus'),
+    url(r'deleteAll/$', delete_all_projects, name='delete-all'),
 
 ]

@@ -12,7 +12,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from main.methods import delayErrorAlertFade, setWrongFileSessionParam, isFileCorrect
-from main.models import MyUser, UserProfile
+from main.models import MyUser, UserProfile, Course
 from main.permissions import has_tutor_permissions
 from main.views import uniqueContraintValidationRedirect
 from student.models import StudentUser
@@ -166,3 +166,11 @@ def read_students_from_file(request):
     else:
         setWrongFileSessionParam(request)
         return redirect('tutor_projects:projects')
+
+def delete_all_students(request):
+    selectedCourseId = request.session.get('selected_course_id')
+    course = Course.objects.get(id=selectedCourseId)
+    for student in course.studentuser_set.all():
+        student.courses.remove(course)
+        student.save()
+    return redirect('tutor_students:index')
