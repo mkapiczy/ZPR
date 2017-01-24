@@ -37,7 +37,10 @@ class StudentsView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
-        delayErrorAlertFade(request,'notAddedStudents')
+        if request.session['notAddedStudents'] is not None:
+            delayErrorAlertFade(request,'notAddedStudents')
+        if request.session['wrongFile'] is not None:
+            delayErrorAlertFade(request, 'wrongFile')
         selected_course_id = request.session.get('selected_course_id')
         if (selected_course_id is not None):
             course_students = StudentUser.objects.filter(courses__in=[selected_course_id])
@@ -145,8 +148,8 @@ def read_students_from_file(request):
         notAddedStudents = []
         fileDest = saveFile(request)
         parsedStudentsJson = getJson.parseFile(fileDest)
-        parsedStudents = json.loads(parsedStudentsJson)
         os.remove(settings.MEDIA_ROOT + "studenci.csv")
+        parsedStudents = json.loads(parsedStudentsJson)
         for student in parsedStudents["Data"]:
             first_name = student["Imiona"].split(' ', 1)[0]
             last_name = student["Nazwisko"]
@@ -165,8 +168,8 @@ def read_students_from_file(request):
             except IntegrityError as e:
                 notAddedStudents.append([first_name + ' ' + last_name])
                 pass
-
-        setNotAddedStudentsRequestParam(notAddedStudents, request)
+        if notAddedStudents.__len__() > 0:
+            setNotAddedStudentsRequestParam(notAddedStudents, request)
         return redirect('tutor_students:index')
     else:
         setWrongFileSessionParam(request)
