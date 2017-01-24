@@ -37,10 +37,7 @@ class StudentsView(View):
             return HttpResponseForbidden('User has no access rights for viewing this page')
 
     def get(self, request):
-        if request.session['notAddedStudents'] is not None:
-            delayErrorAlertFade(request,'notAddedStudents')
-        if request.session['wrongFile'] is not None:
-            delayErrorAlertFade(request, 'wrongFile')
+        delayErrorAlertFade(request, 'wrongFile')
         selected_course_id = request.session.get('selected_course_id')
         if (selected_course_id is not None):
             course_students = StudentUser.objects.filter(courses__in=[selected_course_id])
@@ -144,12 +141,14 @@ class DeleteStudent(View):
 
 
 def read_students_from_file(request):
+    request.session['notAddedStudents'] = None
     if isFileCorrect('students_file', '.csv', request):
         notAddedStudents = []
         fileDest = saveFile(request)
         parsedStudentsJson = getJson.parseFile(fileDest)
         os.remove(settings.MEDIA_ROOT + "studenci.csv")
         parsedStudents = json.loads(parsedStudentsJson)
+        addedStudents = []
         for student in parsedStudents["Data"]:
             first_name = student["Imiona"].split(' ', 1)[0]
             last_name = student["Nazwisko"]
@@ -162,9 +161,9 @@ def read_students_from_file(request):
                     myUser = createMyUser(user)
                     profile = createNewUserProfile(myUser)
                     createNewStudentUser(profile, album_number, group, request)
+                    addedStudents.append(first_name + ' ' + last_name)
                 else:
-                    if not addStudentToSelectedCourse(album_number, request):
-                        notAddedStudents.append(first_name + ' ' + last_name)
+                    addStudentToSelectedCourse(album_number, request)
             except IntegrityError as e:
                 notAddedStudents.append([first_name + ' ' + last_name])
                 pass
@@ -183,6 +182,8 @@ def delete_all_students(request):
     for student in course.studentuser_set.all():
         student.courses.remove(course)
         student.save()
+
+    request.session['notAddedStudents'] = None
     return redirect('tutor_students:index')
 
 def saveFile(request):
